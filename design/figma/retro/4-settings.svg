@@ -1,0 +1,467 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640"><defs><linearGradient id="tb0" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C35BB2"/><stop offset="1" stop-color="#E59BD8"/></linearGradient><linearGradient id="tb1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C35BB2"/><stop offset="1" stop-color="#E59BD8"/></linearGradient></defs>
+<g id="Окно">
+<g id="Рамка окна">
+<rect x="0" y="0" width="960" height="640" fill="#F6C9EA" />
+<rect x="0" y="0" width="960" height="1" fill="#FFF4FC" />
+<rect x="0" y="0" width="1" height="640" fill="#FFF4FC" />
+<rect x="0" y="639" width="960" height="1" fill="#5C2E55" />
+<rect x="959" y="0" width="1" height="640" fill="#5C2E55" />
+<rect x="1" y="1" width="958" height="1" fill="#FBDDF2" />
+<rect x="1" y="1" width="1" height="638" fill="#FBDDF2" />
+<rect x="1" y="638" width="958" height="1" fill="#C57FB6" />
+<rect x="958" y="1" width="1" height="638" fill="#C57FB6" />
+</g>
+<g id="Заголовок">
+<rect x="4" y="4" width="952" height="22" fill="url(#tb0)" />
+<text x="10" y="20.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#FFF4FC" letter-spacing="1">СКРОББЛЕР LAST.FM</text>
+<g id="Кнопка окна «закрыть»">
+<rect x="934" y="6" width="18" height="18" fill="#F6C9EA" />
+<rect x="934" y="6" width="18" height="1" fill="#FFF4FC" />
+<rect x="934" y="6" width="1" height="18" fill="#FFF4FC" />
+<rect x="934" y="23" width="18" height="1" fill="#5C2E55" />
+<rect x="951" y="6" width="1" height="18" fill="#5C2E55" />
+<rect x="935" y="7" width="16" height="1" fill="#FBDDF2" />
+<rect x="935" y="7" width="1" height="16" fill="#FBDDF2" />
+<rect x="935" y="22" width="16" height="1" fill="#C57FB6" />
+<rect x="950" y="7" width="1" height="16" fill="#C57FB6" />
+<rect x="939" y="12" width="2" height="1" fill="#3A1F38" />
+<rect x="944" y="12" width="2" height="1" fill="#3A1F38" />
+<rect x="940" y="13" width="2" height="1" fill="#3A1F38" />
+<rect x="943" y="13" width="2" height="1" fill="#3A1F38" />
+<rect x="941" y="14" width="3" height="1" fill="#3A1F38" />
+<rect x="941" y="15" width="3" height="1" fill="#3A1F38" />
+<rect x="940" y="16" width="2" height="1" fill="#3A1F38" />
+<rect x="943" y="16" width="2" height="1" fill="#3A1F38" />
+<rect x="939" y="17" width="2" height="1" fill="#3A1F38" />
+<rect x="944" y="17" width="2" height="1" fill="#3A1F38" />
+</g>
+<g id="Кнопка окна «развернуть»">
+<rect x="914" y="6" width="18" height="18" fill="#F6C9EA" />
+<rect x="914" y="6" width="18" height="1" fill="#FFF4FC" />
+<rect x="914" y="6" width="1" height="18" fill="#FFF4FC" />
+<rect x="914" y="23" width="18" height="1" fill="#5C2E55" />
+<rect x="931" y="6" width="1" height="18" fill="#5C2E55" />
+<rect x="915" y="7" width="16" height="1" fill="#FBDDF2" />
+<rect x="915" y="7" width="1" height="16" fill="#FBDDF2" />
+<rect x="915" y="22" width="16" height="1" fill="#C57FB6" />
+<rect x="930" y="7" width="1" height="16" fill="#C57FB6" />
+<rect x="919" y="12" width="7" height="1" fill="#3A1F38" />
+<rect x="919" y="13" width="7" height="1" fill="#3A1F38" />
+<rect x="919" y="14" width="1" height="1" fill="#3A1F38" />
+<rect x="925" y="14" width="1" height="1" fill="#3A1F38" />
+<rect x="919" y="15" width="1" height="1" fill="#3A1F38" />
+<rect x="925" y="15" width="1" height="1" fill="#3A1F38" />
+<rect x="919" y="16" width="1" height="1" fill="#3A1F38" />
+<rect x="925" y="16" width="1" height="1" fill="#3A1F38" />
+<rect x="919" y="17" width="7" height="1" fill="#3A1F38" />
+</g>
+<g id="Кнопка окна «свернуть»">
+<rect x="894" y="6" width="18" height="18" fill="#F6C9EA" />
+<rect x="894" y="6" width="18" height="1" fill="#FFF4FC" />
+<rect x="894" y="6" width="1" height="18" fill="#FFF4FC" />
+<rect x="894" y="23" width="18" height="1" fill="#5C2E55" />
+<rect x="911" y="6" width="1" height="18" fill="#5C2E55" />
+<rect x="895" y="7" width="16" height="1" fill="#FBDDF2" />
+<rect x="895" y="7" width="1" height="16" fill="#FBDDF2" />
+<rect x="895" y="22" width="16" height="1" fill="#C57FB6" />
+<rect x="910" y="7" width="1" height="16" fill="#C57FB6" />
+<rect x="900" y="16" width="6" height="1" fill="#3A1F38" />
+<rect x="900" y="17" width="6" height="1" fill="#3A1F38" />
+</g>
+</g>
+<rect x="4" y="30" width="952" height="580" fill="#FBE3F4" id="Рабочая область" />
+<g id="Строка состояния">
+<rect x="6" y="613" width="300" height="22" fill="#F6C9EA" />
+<rect x="6" y="613" width="300" height="1" fill="#C57FB6" />
+<rect x="6" y="613" width="1" height="22" fill="#C57FB6" />
+<rect x="6" y="634" width="300" height="1" fill="#FFF4FC" />
+<rect x="305" y="613" width="1" height="22" fill="#FFF4FC" />
+<rect x="7" y="614" width="298" height="1" fill="#5C2E55" />
+<rect x="7" y="614" width="1" height="20" fill="#5C2E55" />
+<rect x="7" y="633" width="298" height="1" fill="#FBDDF2" />
+<rect x="304" y="614" width="1" height="20" fill="#FBDDF2" />
+<text x="14" y="629.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">listener · Last.fm: в сети</text>
+<rect x="310" y="613" width="160" height="22" fill="#F6C9EA" />
+<rect x="310" y="613" width="160" height="1" fill="#C57FB6" />
+<rect x="310" y="613" width="1" height="22" fill="#C57FB6" />
+<rect x="310" y="634" width="160" height="1" fill="#FFF4FC" />
+<rect x="469" y="613" width="1" height="22" fill="#FFF4FC" />
+<rect x="311" y="614" width="158" height="1" fill="#5C2E55" />
+<rect x="311" y="614" width="1" height="20" fill="#5C2E55" />
+<rect x="311" y="633" width="158" height="1" fill="#FBDDF2" />
+<rect x="468" y="614" width="1" height="20" fill="#FBDDF2" />
+<text x="318" y="629.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">в очереди: 0</text>
+<rect x="474" y="613" width="478" height="22" fill="#F6C9EA" />
+<rect x="474" y="613" width="478" height="1" fill="#C57FB6" />
+<rect x="474" y="613" width="1" height="22" fill="#C57FB6" />
+<rect x="474" y="634" width="478" height="1" fill="#FFF4FC" />
+<rect x="951" y="613" width="1" height="22" fill="#FFF4FC" />
+<rect x="475" y="614" width="476" height="1" fill="#5C2E55" />
+<rect x="475" y="614" width="1" height="20" fill="#5C2E55" />
+<rect x="475" y="633" width="476" height="1" fill="#FBDDF2" />
+<rect x="950" y="614" width="1" height="20" fill="#FBDDF2" />
+<text x="482" y="629.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">сегодня: 23 трека · 1 ч 23 мин</text>
+</g>
+</g>
+<g id="Навигация">
+<g id="Пункт «Сейчас»">
+<rect x="12" y="44" width="188" height="40" fill="#F6C9EA" />
+<rect x="12" y="44" width="188" height="1" fill="#FFF4FC" />
+<rect x="12" y="44" width="1" height="40" fill="#FFF4FC" />
+<rect x="12" y="83" width="188" height="1" fill="#5C2E55" />
+<rect x="199" y="44" width="1" height="40" fill="#5C2E55" />
+<rect x="13" y="45" width="186" height="1" fill="#FBDDF2" />
+<rect x="13" y="45" width="1" height="38" fill="#FBDDF2" />
+<rect x="13" y="82" width="186" height="1" fill="#C57FB6" />
+<rect x="198" y="45" width="1" height="38" fill="#C57FB6" />
+<rect x="32" y="55" width="12" height="2" fill="#3A1F38" />
+<rect x="32" y="57" width="12" height="2" fill="#3A1F38" />
+<rect x="32" y="59" width="2" height="2" fill="#3A1F38" />
+<rect x="42" y="59" width="2" height="2" fill="#3A1F38" />
+<rect x="32" y="61" width="2" height="2" fill="#3A1F38" />
+<rect x="42" y="61" width="2" height="2" fill="#3A1F38" />
+<rect x="32" y="63" width="2" height="2" fill="#3A1F38" />
+<rect x="42" y="63" width="2" height="2" fill="#3A1F38" />
+<rect x="28" y="65" width="6" height="2" fill="#3A1F38" />
+<rect x="38" y="65" width="6" height="2" fill="#3A1F38" />
+<rect x="26" y="67" width="8" height="2" fill="#3A1F38" />
+<rect x="36" y="67" width="8" height="2" fill="#3A1F38" />
+<rect x="26" y="69" width="8" height="2" fill="#3A1F38" />
+<rect x="36" y="69" width="8" height="2" fill="#3A1F38" />
+<rect x="28" y="71" width="4" height="2" fill="#3A1F38" />
+<rect x="38" y="71" width="4" height="2" fill="#3A1F38" />
+<text x="58" y="71.5" font-family="Tiny5, Liberation Mono, monospace" font-size="24" font-weight="400" fill="#3A1F38">Сейчас</text>
+</g>
+<g id="Пункт «Очередь»">
+<rect x="12" y="92" width="188" height="40" fill="#F6C9EA" />
+<rect x="12" y="92" width="188" height="1" fill="#FFF4FC" />
+<rect x="12" y="92" width="1" height="40" fill="#FFF4FC" />
+<rect x="12" y="131" width="188" height="1" fill="#5C2E55" />
+<rect x="199" y="92" width="1" height="40" fill="#5C2E55" />
+<rect x="13" y="93" width="186" height="1" fill="#FBDDF2" />
+<rect x="13" y="93" width="1" height="38" fill="#FBDDF2" />
+<rect x="13" y="130" width="186" height="1" fill="#C57FB6" />
+<rect x="198" y="93" width="1" height="38" fill="#C57FB6" />
+<rect x="26" y="105" width="4" height="2" fill="#3A1F38" />
+<rect x="32" y="105" width="14" height="2" fill="#3A1F38" />
+<rect x="26" y="111" width="4" height="2" fill="#3A1F38" />
+<rect x="32" y="111" width="14" height="2" fill="#3A1F38" />
+<rect x="26" y="117" width="4" height="2" fill="#3A1F38" />
+<rect x="32" y="117" width="14" height="2" fill="#3A1F38" />
+<text x="58" y="119.5" font-family="Tiny5, Liberation Mono, monospace" font-size="24" font-weight="400" fill="#3A1F38">Очередь</text>
+</g>
+<g id="Пункт «Настройки»">
+<rect x="12" y="140" width="188" height="40" fill="#F0B8E0" />
+<rect x="12" y="140" width="188" height="1" fill="#C57FB6" />
+<rect x="12" y="140" width="1" height="40" fill="#C57FB6" />
+<rect x="12" y="179" width="188" height="1" fill="#FFF4FC" />
+<rect x="199" y="140" width="1" height="40" fill="#FFF4FC" />
+<rect x="13" y="141" width="186" height="1" fill="#5C2E55" />
+<rect x="13" y="141" width="1" height="38" fill="#5C2E55" />
+<rect x="13" y="178" width="186" height="1" fill="#FBDDF2" />
+<rect x="198" y="141" width="1" height="38" fill="#FBDDF2" />
+<rect x="32" y="151" width="6" height="2" fill="#C35BB2" />
+<rect x="28" y="153" width="2" height="2" fill="#C35BB2" />
+<rect x="32" y="153" width="6" height="2" fill="#C35BB2" />
+<rect x="40" y="153" width="2" height="2" fill="#C35BB2" />
+<rect x="30" y="155" width="10" height="2" fill="#C35BB2" />
+<rect x="26" y="157" width="8" height="2" fill="#C35BB2" />
+<rect x="36" y="157" width="8" height="2" fill="#C35BB2" />
+<rect x="26" y="159" width="6" height="2" fill="#C35BB2" />
+<rect x="38" y="159" width="6" height="2" fill="#C35BB2" />
+<rect x="26" y="161" width="8" height="2" fill="#C35BB2" />
+<rect x="36" y="161" width="8" height="2" fill="#C35BB2" />
+<rect x="30" y="163" width="10" height="2" fill="#C35BB2" />
+<rect x="28" y="165" width="2" height="2" fill="#C35BB2" />
+<rect x="32" y="165" width="6" height="2" fill="#C35BB2" />
+<rect x="40" y="165" width="2" height="2" fill="#C35BB2" />
+<rect x="32" y="167" width="6" height="2" fill="#C35BB2" />
+<text x="58" y="167.5" font-family="Tiny5, Liberation Mono, monospace" font-size="24" font-weight="400" fill="#3A1F38">Настройки</text>
+</g>
+</g>
+<g id="Содержимое">
+<g id="Окно «Настройки»">
+<g id="Рамка">
+<rect x="216" y="44" width="732" height="546" fill="#F6C9EA" />
+<rect x="216" y="44" width="732" height="1" fill="#FFF4FC" />
+<rect x="216" y="44" width="1" height="546" fill="#FFF4FC" />
+<rect x="216" y="589" width="732" height="1" fill="#5C2E55" />
+<rect x="947" y="44" width="1" height="546" fill="#5C2E55" />
+<rect x="217" y="45" width="730" height="1" fill="#FBDDF2" />
+<rect x="217" y="45" width="1" height="544" fill="#FBDDF2" />
+<rect x="217" y="588" width="730" height="1" fill="#C57FB6" />
+<rect x="946" y="45" width="1" height="544" fill="#C57FB6" />
+</g>
+<g id="Заголовок 2">
+<rect x="219" y="47" width="726" height="20" fill="url(#tb1)" />
+<text x="225" y="62.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#FFF4FC" letter-spacing="1">НАСТРОЙКИ</text>
+<g id="Кнопка окна «закрыть» 2">
+<rect x="923" y="49" width="18" height="16" fill="#F6C9EA" />
+<rect x="923" y="49" width="18" height="1" fill="#FFF4FC" />
+<rect x="923" y="49" width="1" height="16" fill="#FFF4FC" />
+<rect x="923" y="64" width="18" height="1" fill="#5C2E55" />
+<rect x="940" y="49" width="1" height="16" fill="#5C2E55" />
+<rect x="924" y="50" width="16" height="1" fill="#FBDDF2" />
+<rect x="924" y="50" width="1" height="14" fill="#FBDDF2" />
+<rect x="924" y="63" width="16" height="1" fill="#C57FB6" />
+<rect x="939" y="50" width="1" height="14" fill="#C57FB6" />
+<rect x="928" y="54" width="2" height="1" fill="#3A1F38" />
+<rect x="933" y="54" width="2" height="1" fill="#3A1F38" />
+<rect x="929" y="55" width="2" height="1" fill="#3A1F38" />
+<rect x="932" y="55" width="2" height="1" fill="#3A1F38" />
+<rect x="930" y="56" width="3" height="1" fill="#3A1F38" />
+<rect x="930" y="57" width="3" height="1" fill="#3A1F38" />
+<rect x="929" y="58" width="2" height="1" fill="#3A1F38" />
+<rect x="932" y="58" width="2" height="1" fill="#3A1F38" />
+<rect x="928" y="59" width="2" height="1" fill="#3A1F38" />
+<rect x="933" y="59" width="2" height="1" fill="#3A1F38" />
+</g>
+</g>
+</g>
+<g id="Группа «Аккаунт»">
+<rect x="232" y="88" width="700" height="66" fill="none" stroke="#C57FB6" stroke-width="1" />
+<rect x="233" y="89" width="700" height="66" fill="none" stroke="#FFF4FC" stroke-width="1" />
+<rect x="242" y="80" width="70.0" height="16" fill="#F6C9EA" />
+<text x="248" y="93.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#C35BB2">Аккаунт</text>
+</g>
+<g id="Пользователь">
+<rect x="246" y="104" width="36" height="36" fill="#F0B8E0" />
+<rect x="246" y="104" width="36" height="1" fill="#C57FB6" />
+<rect x="246" y="104" width="1" height="36" fill="#C57FB6" />
+<rect x="246" y="139" width="36" height="1" fill="#FFF4FC" />
+<rect x="281" y="104" width="1" height="36" fill="#FFF4FC" />
+<rect x="247" y="105" width="34" height="1" fill="#5C2E55" />
+<rect x="247" y="105" width="1" height="34" fill="#5C2E55" />
+<rect x="247" y="138" width="34" height="1" fill="#FBDDF2" />
+<rect x="280" y="105" width="1" height="34" fill="#FBDDF2" />
+<rect x="259" y="116" width="4" height="2" fill="#C35BB2" />
+<rect x="265" y="116" width="4" height="2" fill="#C35BB2" />
+<rect x="257" y="118" width="14" height="2" fill="#C35BB2" />
+<rect x="257" y="120" width="14" height="2" fill="#C35BB2" />
+<rect x="259" y="122" width="10" height="2" fill="#C35BB2" />
+<rect x="261" y="124" width="6" height="2" fill="#C35BB2" />
+<rect x="263" y="126" width="2" height="2" fill="#C35BB2" />
+<text x="294" y="122" font-family="Tiny5, Liberation Mono, monospace" font-size="24" font-weight="400" fill="#3A1F38">listener</text>
+<text x="294" y="142" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#7A4A72">вход выполнен 12.10.2026</text>
+</g>
+<g id="Кнопка «выйти»">
+<rect x="806" y="108" width="110" height="28" fill="#F6C9EA" />
+<rect x="806" y="108" width="110" height="1" fill="#FFF4FC" />
+<rect x="806" y="108" width="1" height="28" fill="#FFF4FC" />
+<rect x="806" y="135" width="110" height="1" fill="#5C2E55" />
+<rect x="915" y="108" width="1" height="28" fill="#5C2E55" />
+<rect x="807" y="109" width="108" height="1" fill="#FBDDF2" />
+<rect x="807" y="109" width="1" height="26" fill="#FBDDF2" />
+<rect x="807" y="134" width="108" height="1" fill="#C57FB6" />
+<rect x="914" y="109" width="1" height="26" fill="#C57FB6" />
+<text x="861.0" y="127.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38" text-anchor="middle">выйти</text>
+</g>
+<g id="Группа «Правила засчитывания»">
+<rect x="232" y="174" width="700" height="118" fill="none" stroke="#C57FB6" stroke-width="1" />
+<rect x="233" y="175" width="700" height="118" fill="none" stroke="#FFF4FC" stroke-width="1" />
+<rect x="242" y="166" width="182.0" height="16" fill="#F6C9EA" />
+<text x="248" y="179.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#C35BB2">Правила засчитывания</text>
+</g>
+<text x="248" y="208.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">засчитывать трек после:</text>
+<g id="Список «половины трека»">
+<rect x="456" y="190" width="220" height="26" fill="#FFF8FD" />
+<rect x="456" y="190" width="220" height="1" fill="#C57FB6" />
+<rect x="456" y="190" width="1" height="26" fill="#C57FB6" />
+<rect x="456" y="215" width="220" height="1" fill="#FFF4FC" />
+<rect x="675" y="190" width="1" height="26" fill="#FFF4FC" />
+<rect x="457" y="191" width="218" height="1" fill="#5C2E55" />
+<rect x="457" y="191" width="1" height="24" fill="#5C2E55" />
+<rect x="457" y="214" width="218" height="1" fill="#FBDDF2" />
+<rect x="674" y="191" width="1" height="24" fill="#FBDDF2" />
+<text x="464" y="208.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">половины трека</text>
+<rect x="652" y="192" width="22" height="22" fill="#F6C9EA" />
+<rect x="652" y="192" width="22" height="1" fill="#FFF4FC" />
+<rect x="652" y="192" width="1" height="22" fill="#FFF4FC" />
+<rect x="652" y="213" width="22" height="1" fill="#5C2E55" />
+<rect x="673" y="192" width="1" height="22" fill="#5C2E55" />
+<rect x="653" y="193" width="20" height="1" fill="#FBDDF2" />
+<rect x="653" y="193" width="1" height="20" fill="#FBDDF2" />
+<rect x="653" y="212" width="20" height="1" fill="#C57FB6" />
+<rect x="672" y="193" width="1" height="20" fill="#C57FB6" />
+<rect x="659" y="201" width="7" height="1" fill="#3A1F38" />
+<rect x="660" y="202" width="5" height="1" fill="#3A1F38" />
+<rect x="661" y="203" width="3" height="1" fill="#3A1F38" />
+<rect x="662" y="204" width="1" height="1" fill="#3A1F38" />
+</g>
+<text x="692" y="208.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#7A4A72">или 4 минут</text>
+<text x="248" y="240" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#7A4A72">не учитывать треки короче 30 секунд — так требует Last.fm</text>
+<g id="Флажок «интернет-радио: засчитывать через 4 минуты»">
+<rect x="248" y="258" width="16" height="16" fill="#FFF8FD" />
+<rect x="248" y="258" width="16" height="1" fill="#C57FB6" />
+<rect x="248" y="258" width="1" height="16" fill="#C57FB6" />
+<rect x="248" y="273" width="16" height="1" fill="#FFF4FC" />
+<rect x="263" y="258" width="1" height="16" fill="#FFF4FC" />
+<rect x="249" y="259" width="14" height="1" fill="#5C2E55" />
+<rect x="249" y="259" width="1" height="14" fill="#5C2E55" />
+<rect x="249" y="272" width="14" height="1" fill="#FBDDF2" />
+<rect x="262" y="259" width="1" height="14" fill="#FBDDF2" />
+<rect x="259" y="263" width="1" height="1" fill="#3A1F38" />
+<rect x="258" y="264" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="265" width="1" height="1" fill="#3A1F38" />
+<rect x="257" y="265" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="266" width="2" height="1" fill="#3A1F38" />
+<rect x="256" y="266" width="2" height="1" fill="#3A1F38" />
+<rect x="253" y="267" width="4" height="1" fill="#3A1F38" />
+<rect x="254" y="268" width="2" height="1" fill="#3A1F38" />
+<text x="274" y="271.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">интернет-радио: засчитывать через 4 минуты</text>
+</g>
+<g id="Группа «Плееры, которые учитывать»">
+<rect x="232" y="312" width="700" height="96" fill="none" stroke="#C57FB6" stroke-width="1" />
+<rect x="233" y="313" width="700" height="96" fill="none" stroke="#FFF4FC" stroke-width="1" />
+<rect x="242" y="304" width="220.0" height="16" fill="#F6C9EA" />
+<text x="248" y="317.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#C35BB2">Плееры, которые учитывать</text>
+</g>
+<g id="Флажок «Spotify»">
+<rect x="248" y="336" width="16" height="16" fill="#FFF8FD" />
+<rect x="248" y="336" width="16" height="1" fill="#C57FB6" />
+<rect x="248" y="336" width="1" height="16" fill="#C57FB6" />
+<rect x="248" y="351" width="16" height="1" fill="#FFF4FC" />
+<rect x="263" y="336" width="1" height="16" fill="#FFF4FC" />
+<rect x="249" y="337" width="14" height="1" fill="#5C2E55" />
+<rect x="249" y="337" width="1" height="14" fill="#5C2E55" />
+<rect x="249" y="350" width="14" height="1" fill="#FBDDF2" />
+<rect x="262" y="337" width="1" height="14" fill="#FBDDF2" />
+<rect x="259" y="341" width="1" height="1" fill="#3A1F38" />
+<rect x="258" y="342" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="343" width="1" height="1" fill="#3A1F38" />
+<rect x="257" y="343" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="344" width="2" height="1" fill="#3A1F38" />
+<rect x="256" y="344" width="2" height="1" fill="#3A1F38" />
+<rect x="253" y="345" width="4" height="1" fill="#3A1F38" />
+<rect x="254" y="346" width="2" height="1" fill="#3A1F38" />
+<text x="274" y="349.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">Spotify</text>
+<text x="336.0" y="349.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#C35BB2">играет</text>
+</g>
+<g id="Флажок «AIMP»">
+<rect x="578" y="336" width="16" height="16" fill="#FFF8FD" />
+<rect x="578" y="336" width="16" height="1" fill="#C57FB6" />
+<rect x="578" y="336" width="1" height="16" fill="#C57FB6" />
+<rect x="578" y="351" width="16" height="1" fill="#FFF4FC" />
+<rect x="593" y="336" width="1" height="16" fill="#FFF4FC" />
+<rect x="579" y="337" width="14" height="1" fill="#5C2E55" />
+<rect x="579" y="337" width="1" height="14" fill="#5C2E55" />
+<rect x="579" y="350" width="14" height="1" fill="#FBDDF2" />
+<rect x="592" y="337" width="1" height="14" fill="#FBDDF2" />
+<rect x="589" y="341" width="1" height="1" fill="#3A1F38" />
+<rect x="588" y="342" width="2" height="1" fill="#3A1F38" />
+<rect x="582" y="343" width="1" height="1" fill="#3A1F38" />
+<rect x="587" y="343" width="2" height="1" fill="#3A1F38" />
+<rect x="582" y="344" width="2" height="1" fill="#3A1F38" />
+<rect x="586" y="344" width="2" height="1" fill="#3A1F38" />
+<rect x="583" y="345" width="4" height="1" fill="#3A1F38" />
+<rect x="584" y="346" width="2" height="1" fill="#3A1F38" />
+<text x="604" y="349.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">AIMP</text>
+</g>
+<g id="Флажок «Firefox»">
+<rect x="248" y="372" width="16" height="16" fill="#FFF8FD" />
+<rect x="248" y="372" width="16" height="1" fill="#C57FB6" />
+<rect x="248" y="372" width="1" height="16" fill="#C57FB6" />
+<rect x="248" y="387" width="16" height="1" fill="#FFF4FC" />
+<rect x="263" y="372" width="1" height="16" fill="#FFF4FC" />
+<rect x="249" y="373" width="14" height="1" fill="#5C2E55" />
+<rect x="249" y="373" width="1" height="14" fill="#5C2E55" />
+<rect x="249" y="386" width="14" height="1" fill="#FBDDF2" />
+<rect x="262" y="373" width="1" height="14" fill="#FBDDF2" />
+<rect x="259" y="377" width="1" height="1" fill="#3A1F38" />
+<rect x="258" y="378" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="379" width="1" height="1" fill="#3A1F38" />
+<rect x="257" y="379" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="380" width="2" height="1" fill="#3A1F38" />
+<rect x="256" y="380" width="2" height="1" fill="#3A1F38" />
+<rect x="253" y="381" width="4" height="1" fill="#3A1F38" />
+<rect x="254" y="382" width="2" height="1" fill="#3A1F38" />
+<text x="274" y="385.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">Firefox</text>
+</g>
+<g id="Группа «Система»">
+<rect x="232" y="428" width="700" height="104" fill="none" stroke="#C57FB6" stroke-width="1" />
+<rect x="233" y="429" width="700" height="104" fill="none" stroke="#FFF4FC" stroke-width="1" />
+<rect x="242" y="420" width="76.0" height="16" fill="#F6C9EA" />
+<text x="248" y="433.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#C35BB2">Система</text>
+</g>
+<g id="Флажок «запускать при входе в Windows»">
+<rect x="248" y="452" width="16" height="16" fill="#FFF8FD" />
+<rect x="248" y="452" width="16" height="1" fill="#C57FB6" />
+<rect x="248" y="452" width="1" height="16" fill="#C57FB6" />
+<rect x="248" y="467" width="16" height="1" fill="#FFF4FC" />
+<rect x="263" y="452" width="1" height="16" fill="#FFF4FC" />
+<rect x="249" y="453" width="14" height="1" fill="#5C2E55" />
+<rect x="249" y="453" width="1" height="14" fill="#5C2E55" />
+<rect x="249" y="466" width="14" height="1" fill="#FBDDF2" />
+<rect x="262" y="453" width="1" height="14" fill="#FBDDF2" />
+<rect x="259" y="457" width="1" height="1" fill="#3A1F38" />
+<rect x="258" y="458" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="459" width="1" height="1" fill="#3A1F38" />
+<rect x="257" y="459" width="2" height="1" fill="#3A1F38" />
+<rect x="252" y="460" width="2" height="1" fill="#3A1F38" />
+<rect x="256" y="460" width="2" height="1" fill="#3A1F38" />
+<rect x="253" y="461" width="4" height="1" fill="#3A1F38" />
+<rect x="254" y="462" width="2" height="1" fill="#3A1F38" />
+<text x="274" y="465.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">запускать при входе в Windows</text>
+</g>
+<text x="248" y="507.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#7A4A72">журнал: %LOCALAPPDATA%\lastfm-scrobbler</text>
+<g id="Кнопка «открыть папку»">
+<rect x="736" y="488" width="180" height="28" fill="#F6C9EA" />
+<rect x="736" y="488" width="180" height="1" fill="#FFF4FC" />
+<rect x="736" y="488" width="1" height="28" fill="#FFF4FC" />
+<rect x="736" y="515" width="180" height="1" fill="#5C2E55" />
+<rect x="915" y="488" width="1" height="28" fill="#5C2E55" />
+<rect x="737" y="489" width="178" height="1" fill="#FBDDF2" />
+<rect x="737" y="489" width="1" height="26" fill="#FBDDF2" />
+<rect x="737" y="514" width="178" height="1" fill="#C57FB6" />
+<rect x="914" y="489" width="1" height="26" fill="#C57FB6" />
+<rect x="761" y="496" width="6" height="2" fill="#3A1F38" />
+<rect x="761" y="498" width="2" height="2" fill="#3A1F38" />
+<rect x="767" y="498" width="10" height="2" fill="#3A1F38" />
+<rect x="761" y="500" width="2" height="2" fill="#3A1F38" />
+<rect x="777" y="500" width="2" height="2" fill="#3A1F38" />
+<rect x="761" y="502" width="2" height="2" fill="#3A1F38" />
+<rect x="777" y="502" width="2" height="2" fill="#3A1F38" />
+<rect x="761" y="504" width="2" height="2" fill="#3A1F38" />
+<rect x="777" y="504" width="2" height="2" fill="#3A1F38" />
+<rect x="761" y="506" width="18" height="2" fill="#3A1F38" />
+<text x="787" y="507.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38">открыть папку</text>
+</g>
+<g id="Кнопка «ok»">
+<rect x="581" y="547" width="112" height="30" fill="#5C2E55" id="Обводка по умолчанию" />
+<rect x="582" y="548" width="110" height="28" fill="#F6C9EA" />
+<rect x="582" y="548" width="110" height="1" fill="#FFF4FC" />
+<rect x="582" y="548" width="1" height="28" fill="#FFF4FC" />
+<rect x="582" y="575" width="110" height="1" fill="#5C2E55" />
+<rect x="691" y="548" width="1" height="28" fill="#5C2E55" />
+<rect x="583" y="549" width="108" height="1" fill="#FBDDF2" />
+<rect x="583" y="549" width="1" height="26" fill="#FBDDF2" />
+<rect x="583" y="574" width="108" height="1" fill="#C57FB6" />
+<rect x="690" y="549" width="1" height="26" fill="#C57FB6" />
+<text x="637.0" y="567.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38" text-anchor="middle">ok</text>
+</g>
+<g id="Кнопка «отмена»">
+<rect x="702" y="548" width="110" height="28" fill="#F6C9EA" />
+<rect x="702" y="548" width="110" height="1" fill="#FFF4FC" />
+<rect x="702" y="548" width="1" height="28" fill="#FFF4FC" />
+<rect x="702" y="575" width="110" height="1" fill="#5C2E55" />
+<rect x="811" y="548" width="1" height="28" fill="#5C2E55" />
+<rect x="703" y="549" width="108" height="1" fill="#FBDDF2" />
+<rect x="703" y="549" width="1" height="26" fill="#FBDDF2" />
+<rect x="703" y="574" width="108" height="1" fill="#C57FB6" />
+<rect x="810" y="549" width="1" height="26" fill="#C57FB6" />
+<text x="757.0" y="567.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38" text-anchor="middle">отмена</text>
+</g>
+<g id="Кнопка «применить»">
+<rect x="822" y="548" width="110" height="28" fill="#F6C9EA" />
+<rect x="822" y="548" width="110" height="1" fill="#FFF4FC" />
+<rect x="822" y="548" width="1" height="28" fill="#FFF4FC" />
+<rect x="822" y="575" width="110" height="1" fill="#5C2E55" />
+<rect x="931" y="548" width="1" height="28" fill="#5C2E55" />
+<rect x="823" y="549" width="108" height="1" fill="#FBDDF2" />
+<rect x="823" y="549" width="1" height="26" fill="#FBDDF2" />
+<rect x="823" y="574" width="108" height="1" fill="#C57FB6" />
+<rect x="930" y="549" width="1" height="26" fill="#C57FB6" />
+<text x="877.0" y="567.0" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#3A1F38" text-anchor="middle">применить</text>
+</g>
+</g>
+</svg>

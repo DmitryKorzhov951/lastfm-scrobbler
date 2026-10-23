@@ -1,0 +1,29 @@
+[Unit]
+Description=Скробблер Last.fm (MPRIS2 / D-Bus)
+Documentation=https://github.com/DmitryKorzhov951/cpp_learn
+After=graphical-session.target dbus.socket
+PartOf=graphical-session.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=%h/.local/bin/lastfm-scrobbler run
+Restart=on-failure
+RestartSec=10s
+WatchdogSec=120s
+
+ConfigurationDirectory=lastfm-scrobbler
+ConfigurationDirectoryMode=0700
+StateDirectory=lastfm-scrobbler
+StateDirectoryMode=0700
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictRealtime=true
+LockPersonality=true
+
+[Install]
+WantedBy=graphical-session.target default.target

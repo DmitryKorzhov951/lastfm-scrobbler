@@ -1,0 +1,22 @@
+# Собранные бинарники (пути от корня проекта, чтобы шаблон не задел
+# каталог cmd/lastfm-scrobbler/)
+/bin/
+/build/
+/lastfm-scrobbler
+
+# Покрытие и профили
+coverage.out
+*.prof
+
+# Артефакты makepkg
+/packaging/pkg/
+/packaging/src/
+*.pkg.tar.*
+
+# Личные данные: ключи и очередь скробблов здесь появляться не должны
+/config.json
+/session.json
+/queue.json
+
+# Кэш Python от скриптов в tools/
+__pycache__/

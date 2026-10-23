@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="440" viewBox="0 0 560 440"><defs><linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBD3EE"/><stop offset="1" stop-color="#E2C2F2"/></linearGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.18"/></filter><linearGradient id="appgrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C35BB2"/><stop offset="1" stop-color="#E59BD8"/></linearGradient></defs>
+<rect x="0" y="0" width="560" height="440" fill="url(#wall)" id="Рабочий стол" />
+<g id="Панель задач">
+<rect x="0" y="392" width="560" height="48" fill="#F3F3F3" id="Фон" />
+<line x1="0" y1="392" x2="560" y2="392" stroke="#E0E0E0" stroke-width="1"/>
+<path d="M328 419L333 414L338 419" fill="none" stroke="#3A1F38" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+<rect x="350" y="400" width="32" height="32" fill="#E4E4E4" id="Подсветка значка" />
+<g id="Значок скробблера">
+<rect x="358" y="408" width="16" height="16" fill="url(#appgrad2)" />
+<rect x="362.0" y="414.5" width="2.0" height="6.0" fill="#FFF4FC" />
+<rect x="365.0" y="411.5" width="2.0" height="9.0" fill="#FFF4FC" />
+<rect x="368.0" y="413.5" width="2.0" height="7.0" fill="#FFF4FC" />
+</g>
+<path d="M394 414A9 9 0 0 1 410 414M397 418A5 5 0 0 1 407 418" fill="none" stroke="#3A1F38" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="402" cy="422" r="1.3" fill="#3A1F38"/>
+<path d="M424 413H428L433 409V427L428 423H424Z" fill="none" stroke="#3A1F38" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+<text x="544" y="412" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#3A1F38" text-anchor="end">18:52</text>
+<text x="544" y="428" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#3A1F38" text-anchor="end">12.10.2026</text>
+</g>
+<g id="Меню в трее">
+<rect x="216" y="102" width="320" height="278" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон меню" filter="url(#shadow)"/>
+<g id="Пункт «100 gecs — ringtone (remix)»">
+<text x="256" y="129" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#8A8A8A">100 gecs — ringtone (remix)</text>
+</g>
+<g id="Пункт «Spotify · засчитается через 0:45»">
+<text x="256" y="165" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#8A8A8A">Spotify · засчитается через 0:45</text>
+</g>
+<line x1="217" y1="182.5" x2="535" y2="182.5" stroke="#E5E5E5" stroke-width="1"/>
+<g id="Пункт «Открыть окно»">
+<rect x="220" y="187" width="312" height="36" fill="#F0F0F0" rx="4" id="Наведение" />
+<text x="256" y="210" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A">Открыть окно</text>
+</g>
+<g id="Пункт «Приостановить скробблинг»">
+<text x="256" y="246" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Приостановить скробблинг</text>
+</g>
+<g id="Пункт «Запускать при входе в Windows»">
+<g transform="translate(230,269) scale(1.0)">
+<path d="M3.5 8.5L6.5 11.5L12.5 4.5" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<text x="256" y="282" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Запускать при входе в Windows</text>
+</g>
+<g id="Пункт «Профиль на Last.fm»">
+<text x="256" y="318" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Профиль на Last.fm</text>
+</g>
+<line x1="217" y1="335.5" x2="535" y2="335.5" stroke="#E5E5E5" stroke-width="1"/>
+<g id="Пункт «Выход»">
+<text x="256" y="363" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Выход</text>
+</g>
+</g>
+<text x="16" y="28" font-family="Tiny5, Liberation Mono, monospace" font-size="16" font-weight="400" fill="#7A4A72" id="Пояснение">Наведите на значок — подсказка покажет трек; правая кнопка — меню.</text>
+</svg>

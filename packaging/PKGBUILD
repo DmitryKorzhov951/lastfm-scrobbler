@@ -1,0 +1,39 @@
+pkgname=lastfm-scrobbler
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Скробблер Last.fm для Linux: слушает медиаплееры через MPRIS2 (D-Bus)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/DmitryKorzhov951/cpp_learn"
+license=('MIT')
+depends=('dbus')
+makedepends=('go' 'git')
+source=("git+https://github.com/DmitryKorzhov951/cpp_learn.git")
+sha256sums=('SKIP')
+_srcdir="cpp_learn/lastfm-scrobbler"
+
+build() {
+  cd "$srcdir/$_srcdir"
+  export CGO_ENABLED=0
+  export GOFLAGS="-trimpath -mod=readonly -modcacherw"
+  go build -ldflags "-s -w \
+    -X github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/version.Version=$pkgver" \
+    -o build/lastfm-scrobbler ./cmd/lastfm-scrobbler
+}
+
+check() {
+  cd "$srcdir/$_srcdir"
+  go test ./...
+}
+
+package() {
+  cd "$srcdir/$_srcdir"
+  install -Dm755 build/lastfm-scrobbler "$pkgdir/usr/bin/lastfm-scrobbler"
+
+  sed 's|^ExecStart=.*|ExecStart=/usr/bin/lastfm-scrobbler run|' \
+    packaging/systemd/lastfm-scrobbler.service \
+    > "$srcdir/lastfm-scrobbler.service"
+  install -Dm644 "$srcdir/lastfm-scrobbler.service" \
+    "$pkgdir/usr/lib/systemd/user/lastfm-scrobbler.service"
+
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}

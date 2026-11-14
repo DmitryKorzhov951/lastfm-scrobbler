@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/config"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/library"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/media"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/radio"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/ui"
@@ -46,6 +48,9 @@ func (b *uiBackend) State() ui.State {
 		Since:    acc.CreatedAt,
 		Paused:   svc.Paused(),
 		QueueLen: svc.queue.Len(),
+		Theme:    ui.Theme(cfg.Theme),
+		Bursts:   cfg.GlitchBursts,
+		Closed:   append([]string{}, cfg.ClosedPanels...),
 	}
 	switch {
 	case !link.LoggedIn:
@@ -77,11 +82,18 @@ func (b *uiBackend) State() ui.State {
 			Album:       sn.Track.Album,
 			Length:      sn.Track.Length.Seconds(),
 			Played:      sn.Played.Seconds(),
+			Position:    sn.Position.Seconds(),
+			Synced:      sn.Synced,
 			Target:      sn.Target.Seconds(),
+			Left:        sn.Left.Seconds(),
 			Scrobbled:   sn.Scrobbld,
 			Scrobblable: sn.Target > 0,
 			Live:        sn.Track.Live,
 			FromStart:   sn.FromStart,
+			Charts:      svc.ranks(sn.Track.Artist(), sn.Track.Title, sn.Track.Album),
+			Loved:       svc.loved(sn.Track.Artist(), sn.Track.Title, sn.Status == media.Playing),
+			Moment:      svc.moment(sn.Track),
+			Tags:        svc.tags(sn.Track.Artist(), sn.Track.Title),
 		}
 	}
 
@@ -96,16 +108,32 @@ func (b *uiBackend) State() ui.State {
 	tot := svc.hist.Totals(time.Now())
 	st.Today = ui.Totals{Count: tot.TodayCount, Seconds: tot.TodayTime.Seconds()}
 	st.All = ui.Totals{Count: tot.AllCount, Seconds: tot.AllTime.Seconds()}
-	for _, e := range svc.hist.Recent(10) {
-		st.Recent = append(st.Recent, ui.Scrobble{
-			ID: e.ID, Started: e.Started, Artist: e.Artist, Title: e.Title,
-			Status: string(e.Status), Reason: e.Reason,
-		})
-	}
-	if st.Recent == nil {
-		st.Recent = []ui.Scrobble{}
+	st.Recent = svc.recentScrobbles(10)
+	st.Library = svc.libSync.Status()
+	switch {
+	case svc.localMode():
+		st.All.Count = svc.archive.Len()
+	case st.Library.Plays > 0:
+		st.All.Count = svc.lib.Total(svc.localPlays())
 	}
 	return st
+}
+
+func (b *uiBackend) Top(kind, period string, offset int) (library.Top, error) {
+	lib, extra := b.svc.stats()
+	return lib.Top(kind, period, offset, time.Now(), extra)
+}
+
+func (b *uiBackend) Card(kind, artist, title, album string) (library.Card, error) {
+	lib, extra := b.svc.stats()
+	return lib.Card(kind, artist, title, album, time.Now(), extra)
+}
+
+func (b *uiBackend) ReloadLibrary() error {
+	if b.svc.account().Username == "" {
+		return errors.New("вход не выполнен")
+	}
+	return b.svc.libSync.Reload()
 }
 
 func (b *uiBackend) Queue() []ui.QueueItem {
@@ -142,6 +170,10 @@ func (b *uiBackend) Settings() ui.Settings {
 		Autostart:    autostartEnabled(),
 		CanAutostart: autostartSupported,
 		LogDir:       logDir(),
+		Theme:        ui.Theme(cfg.Theme),
+		Bursts:       &cfg.GlitchBursts,
+		LyricsDir:    cfg.LyricsPath(),
+		LyricsAuto:   config.DefaultLyricsFolder(),
 	}
 	for _, p := range b.svc.hist.Players() {
 		s.Players = append(s.Players, ui.PlayerSetting{
@@ -158,6 +190,17 @@ func (b *uiBackend) SaveSettings(ctx context.Context, s ui.Settings) error {
 	cfg := b.svc.config()
 	cfg.ScrobblePercent = s.Percent
 	cfg.SkipUnknownLength = !s.Radio
+	if s.Theme != "" {
+		cfg.Theme = ui.Theme(s.Theme)
+	}
+	if s.Bursts != nil {
+		cfg.GlitchBursts = *s.Bursts
+	}
+	folder, err := lyricsFolderSetting(s.LyricsDir)
+	if err != nil {
+		return err
+	}
+	cfg.LyricsFolder = folder
 	for _, p := range s.Players {
 		if p.Enabled {
 			cfg.IgnoredPlayers = without(cfg.IgnoredPlayers, p.Name)
@@ -207,6 +250,10 @@ func (b *uiBackend) Open(what string) error {
 		return openURL("https://www.last.fm/user/" + url.PathEscape(user))
 	case "keys":
 		return openURL(keysPage)
+	case "lyrics":
+		return b.openLyricsSearch()
+	case "lyricsdir":
+		return b.openLyricsFolder()
 	case "logs":
 		return openFolder(logDir())
 	case "auth":
@@ -266,3 +313,26 @@ func (b *uiBackend) SetRadioVolume(volume int) error { return b.svc.radio.SetVol
 func (b *uiBackend) RadioStream(w http.ResponseWriter, r *http.Request, id string) {
 	b.svc.radio.ServeStream(w, r, id)
 }
+
+func (b *uiBackend) NowCover() string {
+	sn, ok := b.svc.activeSnapshot()
+	if !ok || !sn.Track.Valid() {
+		return ""
+	}
+	return b.svc.covers.Key(sn.ID, sn.Track)
+}
+
+func (b *uiBackend) Cover(key string) ([]byte, string, bool) {
+	img, ok := b.svc.covers.Image(key)
+	return img.Data, img.Type, ok
+}
+
+func (b *uiBackend) History(limit int) []ui.Scrobble { return b.svc.recentScrobbles(limit) }
+
+func (b *uiBackend) SyncLibrary() { b.svc.libSync.SyncNow() }
+
+func (b *uiBackend) Phone() ui.PhoneInfo { return b.svc.phoneInfo() }
+
+func (b *uiBackend) SetPhone(enabled bool) (ui.PhoneInfo, error) { return b.svc.setPhone(enabled) }
+
+func (b *uiBackend) ResetPhone() (ui.PhoneInfo, error) { return b.svc.resetPhone() }

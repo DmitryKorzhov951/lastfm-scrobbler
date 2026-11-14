@@ -15,10 +15,24 @@ const (
 	MapSize    = 2048
 
 	WMCommand    = 0x0400 + 0x75
+	WMProperty   = 0x0400 + 0x77
 	StatusGet    = 1
 	StatusPlayer = 4
 	StatusPos    = 31
+	PropPosition = 0x20
 )
+
+func Position(secs, ms uint64, msOK bool) time.Duration {
+	coarse := time.Duration(secs) * time.Second
+	if !msOK {
+		return coarse
+	}
+	fine := time.Duration(ms) * time.Millisecond
+	if d := fine - coarse; d >= -time.Second && d < 2*time.Second {
+		return fine
+	}
+	return coarse
+}
 
 const (
 	stateStopped = 0
@@ -142,6 +156,7 @@ func ToState(info Info, state int, pos time.Duration, at time.Time) media.State 
 		Position:      pos,
 		At:            at,
 		PositionFresh: true,
+		PositionKnown: true,
 	}
 	switch state {
 	case statePlaying:

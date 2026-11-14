@@ -22,5 +22,3 @@ type Options struct {
 }
 
 func New(opts Options) (Watcher, error) { return newWatcher(opts) }
-
-func List(ctx context.Context) ([]media.State, error) { return listPlayers(ctx) }

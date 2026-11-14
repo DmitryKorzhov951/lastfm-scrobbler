@@ -70,6 +70,29 @@ func (q *Queue) SetLastID(id int64) {
 	}
 }
 
+func (q *Queue) NextID() int64 {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	q.lastID++
+	return q.lastID
+}
+
+func (q *Queue) PushItems(items []Item) error {
+	if len(items) == 0 {
+		return nil
+	}
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	for _, it := range items {
+		q.lastID = max(q.lastID, it.ID)
+	}
+	q.items = append(q.items, items...)
+	if len(q.items) > q.max {
+		q.items = q.items[len(q.items)-q.max:]
+	}
+	return q.saveLocked()
+}
+
 func (q *Queue) Len() int {
 	q.mu.Lock()
 	defer q.mu.Unlock()

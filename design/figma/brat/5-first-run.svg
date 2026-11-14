@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640"><defs><filter id="soft" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="0.75"/></filter><linearGradient id="appgrad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#000000"/></linearGradient><linearGradient id="appgrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#000000"/></linearGradient></defs>
+<rect x="0" y="0" width="960" height="640" fill="#8ACE00" stroke="#000000" stroke-width="1" id="Окно" />
+<g id="Заголовок окна">
+<g id="Значок">
+<rect x="12" y="8" width="16" height="16" fill="url(#appgrad1)" />
+<rect x="16.0" y="14.5" width="2.0" height="6.0" fill="#8ACE00" />
+<rect x="19.0" y="11.5" width="2.0" height="9.0" fill="#8ACE00" />
+<rect x="22.0" y="13.5" width="2.0" height="7.0" fill="#8ACE00" />
+</g>
+<text x="38" y="21" font-family="Arial, Liberation Sans, sans-serif" font-size="12" font-weight="400" fill="#000000">скробблер last.fm</text>
+<path d="M840 16H850" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+<rect x="886" y="11" width="10" height="10" fill="none" stroke="#000000" stroke-width="1" />
+<path d="M932 11L942 21M942 11L932 21" fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<g id="Первый запуск">
+<rect x="250.0" y="64" width="460" height="524" fill="#8ACE00" stroke="#000000" stroke-width="1" id="Карточка" />
+<g id="Значок приложения">
+<rect x="452.0" y="96" width="56" height="56" fill="url(#appgrad2)" />
+<rect x="466.0" y="118.8" width="7.0" height="21.0" fill="#8ACE00" />
+<rect x="476.5" y="108.2" width="7.0" height="31.5" fill="#8ACE00" />
+<rect x="487.0" y="115.2" width="7.0" height="24.5" fill="#8ACE00" />
+</g>
+<text x="480.0" y="192" font-family="Arial, Liberation Sans, sans-serif" font-size="24" font-weight="400" fill="#000000" transform="translate(480.0 0) scale(0.84 1) translate(-480.0 0)" filter="url(#soft)" text-anchor="middle" id="Заголовок">добро пожаловать</text>
+<text x="480.0" y="220" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#203300" text-anchor="middle" id="Пояснение">чтобы отправлять прослушивания, подключите</text>
+<text x="480.0" y="240" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#203300" text-anchor="middle" id="Пояснение 2">приложение к своему аккаунту last.fm.</text>
+<g id="Шаг 1">
+<text x="286.0" y="288" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#000000">1. ключи приложения</text>
+<text x="654.0" y="288" font-family="Arial, Liberation Sans, sans-serif" font-size="13" font-weight="400" fill="#000000" text-anchor="end">получить ключи</text>
+<g transform="translate(660.0,276) scale(0.875)">
+<path d="M9.5 2.5H13.5V6.5M13.5 2.5L8 8M12 9.5V13.5H2.5V4H6.5" fill="none" stroke="#000000" stroke-width="1.7142857142857142" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<g id="Поле «API key»">
+<text x="286.0" y="312" font-family="Arial, Liberation Sans, sans-serif" font-size="12" font-weight="400" fill="#203300">api key</text>
+<rect x="286.5" y="320.5" width="387.0" height="31" fill="#8ACE00" stroke="#000000" stroke-width="1" />
+<rect x="287.0" y="350" width="386.0" height="2" fill="#000000" id="Фокус" />
+<text x="298.0" y="341" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#4A6B00">32 символа</text>
+</g>
+<g id="Поле «Shared secret»">
+<text x="286.0" y="376" font-family="Arial, Liberation Sans, sans-serif" font-size="12" font-weight="400" fill="#203300">shared secret</text>
+<rect x="286.5" y="384.5" width="387.0" height="31" fill="#8ACE00" stroke="#000000" stroke-width="1" />
+<text x="298.0" y="405" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#000000">••••••••••••••••••••</text>
+</g>
+</g>
+<g id="Шаг 2">
+<text x="286.0" y="452" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#000000">2. вход в last.fm</text>
+<g id="Кнопка «Войти через Last.fm»">
+<rect x="286.0" y="468" width="388.0" height="40" fill="#000000" />
+<g transform="translate(398.34999999999997,480.0) scale(1.0)">
+<circle cx="5.5" cy="10.5" r="3" fill="none" stroke="#8ACE00" stroke-width="1.5"/>
+<path d="M7.7 8.3L13.5 2.5M11.5 4.5L13 6M10 6L11.3 7.3" fill="none" stroke="#8ACE00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<text x="422.34999999999997" y="493.0" font-family="Arial, Liberation Sans, sans-serif" font-size="14" font-weight="400" fill="#8ACE00">войти через last.fm</text>
+</g>
+<text x="480.0" y="540" font-family="Arial, Liberation Sans, sans-serif" font-size="12" font-weight="400" fill="#203300" text-anchor="middle">откроется браузер. разрешите доступ и вернитесь сюда —</text>
+<text x="480.0" y="558" font-family="Arial, Liberation Sans, sans-serif" font-size="12" font-weight="400" fill="#203300" text-anchor="middle">пароль от last.fm программе не нужен.</text>
+</g>
+</g>
+</svg>

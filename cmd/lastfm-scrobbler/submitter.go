@@ -8,6 +8,7 @@ import (
 
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/history"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/lastfm"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/library"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/queue"
 )
 
@@ -18,15 +19,17 @@ const maxBatchesPerFlush = 4
 const unknownLengthSeconds = 240
 
 type submitter struct {
-	queue  *queue.Queue
-	hist   *history.Store
-	log    *slog.Logger
-	dryRun bool
-	retry  time.Duration
+	queue   *queue.Queue
+	hist    *history.Store
+	archive *library.Store
+	log     *slog.Logger
+	retry   time.Duration
 
 	nowPlaying chan lastfm.Track
 	scrobbles  chan lastfm.Scrobble
 	flushReq   chan struct{}
+
+	addMu sync.Mutex
 
 	mu          sync.Mutex
 	client      *lastfm.Client
@@ -38,13 +41,12 @@ type submitter struct {
 	authErr     bool
 }
 
-func newSubmitter(client *lastfm.Client, q *queue.Queue, hist *history.Store, retry time.Duration, dryRun bool, log *slog.Logger) *submitter {
+func newSubmitter(client *lastfm.Client, q *queue.Queue, hist *history.Store, retry time.Duration, log *slog.Logger) *submitter {
 	return &submitter{
 		client:     client,
 		queue:      q,
 		hist:       hist,
 		log:        log,
-		dryRun:     dryRun,
 		retry:      retry,
 		nowPlaying: make(chan lastfm.Track, 8),
 		scrobbles:  make(chan lastfm.Scrobble, 32),
@@ -122,10 +124,30 @@ func (s *submitter) Scrobble(sc lastfm.Scrobble) {
 	}
 }
 
+func (s *submitter) Exclusive(f func()) {
+	s.addMu.Lock()
+	defer s.addMu.Unlock()
+	f()
+}
+
 func (s *submitter) enqueue(sc lastfm.Scrobble) {
-	it, err := s.queue.Push(sc)
-	if err != nil {
-		s.log.Error("не удалось сохранить скроббл в очередь", "err", err)
+	s.addMu.Lock()
+	defer s.addMu.Unlock()
+	status := history.Queued
+	var id int64
+	if s.currentClient() == nil {
+		status, id = history.Local, s.queue.NextID()
+	} else {
+		it, err := s.queue.Push(sc)
+		if err != nil {
+			s.log.Error("не удалось сохранить скроббл в очередь", "err", err)
+		}
+		id = it.ID
+	}
+	if s.archive != nil {
+		if _, err := s.archive.Add([]library.Play{{At: sc.Timestamp, Artist: sc.Artist, Title: sc.Title, Album: sc.Album}}); err != nil {
+			s.log.Error("не удалось сохранить прослушивание на диск", "err", err)
+		}
 	}
 	if s.hist == nil {
 		return
@@ -134,14 +156,14 @@ func (s *submitter) enqueue(sc lastfm.Scrobble) {
 	if secs <= 0 {
 		secs = unknownLengthSeconds
 	}
-	err = s.hist.Add(history.Entry{
-		ID:      it.ID,
+	err := s.hist.Add(history.Entry{
+		ID:      id,
 		Artist:  sc.Artist,
 		Title:   sc.Title,
 		Album:   sc.Album,
 		Seconds: secs,
 		Started: sc.Timestamp,
-		Status:  history.Queued,
+		Status:  status,
 	})
 	if err != nil {
 		s.log.Error("не удалось записать историю", "err", err)
@@ -175,10 +197,6 @@ func (s *submitter) Run(ctx context.Context) {
 }
 
 func (s *submitter) sendNowPlaying(ctx context.Context, t lastfm.Track) {
-	if s.dryRun {
-		s.log.Info("[dry-run] сейчас играет", "track", t.String())
-		return
-	}
 	client := s.currentClient()
 	if client == nil {
 		return
@@ -201,17 +219,6 @@ func (s *submitter) flush(ctx context.Context, force bool) {
 	wait := !force && time.Now().Before(s.nextAttempt)
 	s.mu.Unlock()
 	if wait {
-		return
-	}
-	if s.dryRun {
-		items := s.queue.Items()
-		for _, it := range items {
-			s.log.Info("[dry-run] скроббл", "track", it.Scrobble.Track.String(),
-				"timestamp", it.Scrobble.Timestamp.Format(time.RFC3339))
-		}
-		if _, err := s.queue.Remove(itemIDs(items)...); err != nil {
-			s.log.Error("не удалось очистить очередь", "err", err)
-		}
 		return
 	}
 	client := s.currentClient()
@@ -373,7 +380,7 @@ func (s *submitter) finalFlush() {
 		}
 		break
 	}
-	if s.queue.Len() == 0 || s.dryRun {
+	if s.queue.Len() == 0 {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

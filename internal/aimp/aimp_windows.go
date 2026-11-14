@@ -36,7 +36,8 @@ func Read(at time.Time) (st media.State, ok bool, err error) {
 	if !replied {
 		return st, false, errors.New("AIMP не отвечает")
 	}
-	pos, _ := send(hwnd, StatusPos)
+	secs, _ := send(hwnd, StatusPos)
+	ms, msOK := property(hwnd, PropPosition)
 
 	buf, err := readShared(name)
 	if err != nil {
@@ -46,13 +47,25 @@ func Read(at time.Time) (st media.State, ok bool, err error) {
 	if err != nil {
 		return st, false, err
 	}
-	return ToState(info, int(state), time.Duration(pos)*time.Second, at), true, nil
+	st = ToState(info, int(state), Position(uint64(secs), uint64(ms), msOK), at)
+	if st.Track.Valid() {
+		st.Art = trackArt(hwnd, info, at)
+	}
+	return st, true, nil
 }
 
 func send(hwnd, what uintptr) (uintptr, bool) {
 	const smtoAbortIfHung = 0x0002
 	var result uintptr
 	r, _, _ := procSendMessageTimeoutW.Call(hwnd, WMCommand, StatusGet, what,
+		smtoAbortIfHung, replyTimeout, uintptr(unsafe.Pointer(&result)))
+	return result, r != 0
+}
+
+func property(hwnd, id uintptr) (uintptr, bool) {
+	const smtoAbortIfHung = 0x0002
+	var result uintptr
+	r, _, _ := procSendMessageTimeoutW.Call(hwnd, WMProperty, id, 0,
 		smtoAbortIfHung, replyTimeout, uintptr(unsafe.Pointer(&result)))
 	return result, r != 0
 }

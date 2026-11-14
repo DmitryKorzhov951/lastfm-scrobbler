@@ -18,6 +18,7 @@ import (
 	"github.com/saltosystems/winrt-go/windows/media/control"
 
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/aimp"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/cover"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/media"
 )
 
@@ -83,13 +84,15 @@ func (w *Watcher) Run(ctx context.Context) error {
 	defer mgr.Release()
 
 	seen := make(map[string]bool)
+	arts := cover.NewAttempts()
 	poll := func() {
-		raws, err := readSessions(mgr)
+		now := w.opts.Now()
+		raws, err := readSessions(mgr, arts, now, w.opts.Log)
+		arts.Sweep()
 		if err != nil {
 			w.opts.Log.Debug("не удалось прочитать медиасессии", "err", err)
 			return
 		}
-		now := w.opts.Now()
 		current := make(map[string]bool, len(raws))
 		for _, st := range withAIMP(statesOf(raws, now), now, w.opts.Log) {
 			if !Allowed(st.Name, w.opts.Allow, w.opts.Deny) {
@@ -130,42 +133,6 @@ func (w *Watcher) send(ctx context.Context, st media.State) {
 	case w.events <- st:
 	case <-ctx.Done():
 	case <-w.closed:
-	}
-}
-
-func ListPlayers(ctx context.Context) ([]media.State, error) {
-	type result struct {
-		states []media.State
-		err    error
-	}
-	done := make(chan result, 1)
-
-	go func() {
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		initWinRT(slog.Default())
-
-		mgr, err := requestManager()
-		if err != nil {
-			done <- result{err: fmt.Errorf("системные медиаэлементы Windows недоступны: %w", err)}
-			return
-		}
-		defer mgr.Release()
-
-		raws, err := readSessions(mgr)
-		if err != nil {
-			done <- result{err: err}
-			return
-		}
-		now := time.Now()
-		done <- result{states: withAIMP(statesOf(raws, now), now, slog.Default())}
-	}()
-
-	select {
-	case r := <-done:
-		return r.states, r.err
-	case <-ctx.Done():
-		return nil, ctx.Err()
 	}
 }
 
@@ -222,7 +189,7 @@ func requestManager() (*control.GlobalSystemMediaTransportControlsSessionManager
 	return (*control.GlobalSystemMediaTransportControlsSessionManager)(ptr), nil
 }
 
-func readSessions(mgr *control.GlobalSystemMediaTransportControlsSessionManager) ([]Raw, error) {
+func readSessions(mgr *control.GlobalSystemMediaTransportControlsSessionManager, arts *cover.Attempts, now time.Time, log *slog.Logger) ([]Raw, error) {
 	vec, err := mgr.GetSessions()
 	if err != nil {
 		return nil, err
@@ -241,7 +208,7 @@ func readSessions(mgr *control.GlobalSystemMediaTransportControlsSessionManager)
 			continue
 		}
 		s := (*control.GlobalSystemMediaTransportControlsSession)(ptr)
-		r, err := readSession(s)
+		r, err := readSession(s, arts, now, log)
 		s.Release()
 		if err != nil {
 			continue
@@ -251,7 +218,7 @@ func readSessions(mgr *control.GlobalSystemMediaTransportControlsSessionManager)
 	return out, nil
 }
 
-func readSession(s *control.GlobalSystemMediaTransportControlsSession) (Raw, error) {
+func readSession(s *control.GlobalSystemMediaTransportControlsSession, arts *cover.Attempts, now time.Time, log *slog.Logger) (Raw, error) {
 	var r Raw
 
 	id, err := s.GetSourceAppUserModelId()
@@ -303,6 +270,18 @@ func readSession(s *control.GlobalSystemMediaTransportControlsSession) (Raw, err
 	r.Album, _ = mp.GetAlbumTitle()
 	r.AlbumArtist, _ = mp.GetAlbumArtist()
 	r.TrackNumber, _ = mp.GetTrackNumber()
+
+	if r.Title != "" {
+		k := r.AUMID + "\x00" + r.Artist + "\x00" + r.Title + "\x00" + r.Album
+		if arts.Due(k, now) {
+			data, err := readThumbnail(mp)
+			if err != nil {
+				log.Debug("не удалось прочитать обложку", "player", AppName(r.AUMID), "err", err)
+			}
+			arts.Put(k, data, now)
+		}
+		r.Art = arts.Get(k)
+	}
 	return r, nil
 }
 

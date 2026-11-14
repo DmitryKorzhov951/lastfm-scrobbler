@@ -19,6 +19,7 @@ const (
 	Queued  Status = "queued"
 	Sent    Status = "sent"
 	Ignored Status = "ignored"
+	Local   Status = "local"
 )
 
 type Entry struct {
@@ -151,6 +152,19 @@ func (s *Store) Delete(ids ...int64) error {
 	return s.saveLocked()
 }
 
+func (s *Store) Pick(ids ...int64) []Entry {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	want := idSet(ids)
+	var out []Entry
+	for _, e := range s.f.Entries {
+		if want[e.ID] {
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
 func (s *Store) Recent(n int) []Entry {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -160,6 +174,18 @@ func (s *Store) Recent(n int) []Entry {
 	out := make([]Entry, 0, n)
 	for i := len(s.f.Entries) - 1; i >= 0 && len(out) < n; i-- {
 		out = append(out, s.f.Entries[i])
+	}
+	return out
+}
+
+func (s *Store) Since(t time.Time) []Entry {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	var out []Entry
+	for _, e := range s.f.Entries {
+		if !e.Started.Before(t) {
+			out = append(out, e)
+		}
 	}
 	return out
 }

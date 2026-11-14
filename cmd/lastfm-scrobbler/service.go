@@ -13,29 +13,37 @@ import (
 	"time"
 
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/config"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/cover"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/history"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/lastfm"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/library"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/lyrics"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/media"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/moments"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/player"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/queue"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/radio"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/scrobbler"
-	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/sdnotify"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/version"
 )
 
 type service struct {
 	log         *slog.Logger
-	dryRun      bool
 	cfgPath     string
 	sessionPath string
 
-	queue  *queue.Queue
-	hist   *history.Store
-	sub    *submitter
-	radio  *radio.Radio
-	paused atomic.Bool
-	calls  chan func(*scrobbler.Engine)
+	queue   *queue.Queue
+	hist    *history.Store
+	lib     *library.Store
+	archive *library.Store
+	libSync *library.Syncer
+	sub     *submitter
+	radio   *radio.Radio
+	covers  *cover.Store
+	lyrics  *lyrics.Store
+	moments *moments.Store
+	paused  atomic.Bool
+	calls   chan func(*scrobbler.Engine)
 
 	newWatcher func(player.Options) (player.Watcher, error)
 
@@ -44,6 +52,15 @@ type service struct {
 	session config.Session
 	snaps   []scrobbler.Snapshot
 	login   *pendingLogin
+
+	phone phoneState
+
+	ranksMu sync.Mutex
+	ranked  rankCache
+
+	love   lovedCache
+	tagged tagCache
+	recs   recsCache
 }
 
 type pendingLogin struct {
@@ -53,7 +70,7 @@ type pendingLogin struct {
 	started time.Time
 }
 
-func newService(e *env, dryRun bool) (*service, error) {
+func newService(e *env) (*service, error) {
 	q, err := queue.Open(e.queuePath, e.cfg.QueueLimit)
 	if err != nil {
 		if q == nil {
@@ -74,6 +91,26 @@ func newService(e *env, dryRun bool) (*service, error) {
 	}
 	q.SetLastID(hist.LastID())
 
+	lib, err := openLibrary(e)
+	if err != nil {
+		if lib == nil {
+			return nil, err
+		}
+		e.log.Warn("история прослушиваний Last.fm восстановлена не полностью", "err", err)
+	}
+	archive, err := openArchive(e, hist)
+	if err != nil {
+		if archive == nil {
+			return nil, err
+		}
+		e.log.Warn("прослушивания на этом компьютере восстановлены не полностью", "err", err)
+	}
+
+	mom, err := openMoments(e)
+	if err != nil {
+		e.log.Warn("любимые моменты сброшены", "err", err)
+	}
+
 	radioPath, err := config.RadioPath()
 	if err != nil {
 		return nil, err
@@ -88,18 +125,30 @@ func newService(e *env, dryRun bool) (*service, error) {
 
 	s := &service{
 		log:         e.log,
-		dryRun:      dryRun,
 		cfgPath:     e.cfgPath,
 		sessionPath: e.sessionPath,
 		queue:       q,
 		hist:        hist,
+		lib:         lib,
+		archive:     archive,
+		moments:     mom,
 		radio:       rad,
 		calls:       make(chan func(*scrobbler.Engine)),
 		newWatcher:  player.New,
 		cfg:         e.cfg,
 		session:     e.session,
 	}
-	s.sub = newSubmitter(s.newClient(e.cfg, e.session.Key), q, hist, e.cfg.RetryInterval.Duration(), dryRun, e.log)
+	s.sub = newSubmitter(s.newClient(e.cfg, e.session.Key), q, hist, e.cfg.RetryInterval.Duration(), e.log)
+	s.sub.archive = archive
+	if e.session.Key == "" {
+		s.keepLocal()
+	}
+	s.covers = newCovers(e.log)
+	s.lyrics = newLyrics(s, e.log)
+	s.covers.SetFinder(s.findCover)
+	s.libSync = library.NewSyncer(lib, e.log)
+	s.libSync.ErrorText = libraryErrorText
+	s.setLibraryAccount(e.cfg, e.session)
 	return s, nil
 }
 
@@ -122,7 +171,7 @@ func engineOptions(cfg config.Config) scrobbler.Options {
 		MaxPlayTime:           cfg.MaxPlayTime.Duration(),
 		Percent:               cfg.ScrobblePercent,
 		SkipUnknownLength:     cfg.SkipUnknownLength,
-		IgnoreInitialPosition: !player.PositionReliable,
+		IgnoreInitialPosition: true,
 	}
 }
 
@@ -166,30 +215,22 @@ func (s *service) Run(ctx context.Context, ready func()) error {
 	watchErr := make(chan error, 1)
 	go func() { watchErr <- watcher.Run(watchCtx) }()
 	go s.radio.Run(watchCtx)
+	libDone := make(chan struct{})
+	go func() {
+		defer close(libDone)
+		s.libSync.Run(watchCtx)
+	}()
 
 	s.log.Info("скробблер запущен",
 		"version", version.Version,
 		"user", s.account().Username,
-		"queue", s.queue.Len(),
-		"source", player.Source,
-		"dry_run", s.dryRun)
+		"queue", s.queue.Len())
 	if ready != nil {
 		ready()
 	}
 
 	tick := time.NewTicker(time.Second)
 	defer tick.Stop()
-
-	watchdog := sdnotify.WatchdogInterval()
-	var watchdogC <-chan time.Time
-	if watchdog > 0 {
-		wt := time.NewTicker(watchdog)
-		defer wt.Stop()
-		watchdogC = wt.C
-	}
-
-	statusTick := time.NewTicker(30 * time.Second)
-	defer statusTick.Stop()
 
 	events := watcher.Events()
 	var runErr error
@@ -222,22 +263,16 @@ loop:
 		case f := <-s.calls:
 			f(engine)
 			s.publish(engine)
-
-		case <-statusTick.C:
-			sdnotify.Status("%s; в очереди %d", currentTrackLine(engine), s.queue.Len())
-
-		case <-watchdogC:
-			sdnotify.Watchdog()
 		}
 	}
 
-	sdnotify.Stopping()
-	sdnotify.Status("завершение работы")
 	s.log.Info("остановка скробблера")
 
 	stopWatch()
+	s.moments.Close(time.Now())
 	stopSub()
 	<-subDone
+	<-libDone
 	return runErr
 }
 
@@ -250,15 +285,18 @@ func (s *service) update(engine *scrobbler.Engine, st media.State) {
 			st = media.State{ID: st.ID, Name: st.Name, At: st.At, Gone: true}
 		}
 	}
+	s.covers.Note(st)
 	engine.Update(st)
 	s.publish(engine)
 }
 
 func (s *service) publish(engine *scrobbler.Engine) {
-	snaps := engine.Snapshots()
+	now := time.Now()
+	snaps := engine.SnapshotsAt(now)
 	s.mu.Lock()
 	s.snaps = snaps
 	s.mu.Unlock()
+	s.moments.Observe(momentSamples(snaps), now)
 }
 
 func (s *service) do(ctx context.Context, f func(*scrobbler.Engine)) {
@@ -333,10 +371,17 @@ func (s *service) SetPaused(p bool) {
 func (s *service) Paused() bool { return s.paused.Load() }
 
 func (s *service) DeleteQueued(ids ...int64) error {
+	gone := s.hist.Pick(ids...)
 	if _, err := s.queue.Remove(ids...); err != nil {
 		return err
 	}
-	return s.hist.Delete(ids...)
+	if err := s.hist.Delete(ids...); err != nil {
+		return err
+	}
+	if _, err := s.archive.Remove(playsOf(gone)); err != nil {
+		return fmt.Errorf("прослушивания на этом компьютере: %w", err)
+	}
+	return nil
 }
 
 func (s *service) ClearQueue() error {
@@ -380,7 +425,12 @@ func (s *service) SaveKeys(key, secret string) error {
 	s.mu.Lock()
 	s.cfg = cfg
 	s.login = nil
+	sess := s.session
 	s.mu.Unlock()
+	if sess.Key != "" {
+		s.setLibraryAccount(cfg, sess)
+	}
+	s.covers.SetFinder(s.findCover)
 	return nil
 }
 
@@ -430,6 +480,8 @@ func (s *service) CheckLogin(ctx context.Context) (config.Session, error) {
 	cfg := s.cfg
 	s.mu.Unlock()
 	s.sub.SetClient(s.newClient(cfg, saved.Key))
+	s.setLibraryAccount(cfg, saved)
+	s.sendRecentLocal()
 	s.log.Info("вход выполнен", "user", saved.Username)
 	return saved, nil
 }
@@ -443,6 +495,8 @@ func (s *service) Logout() error {
 	s.login = nil
 	s.mu.Unlock()
 	s.sub.SetClient(nil)
+	s.libSync.SetAccount(nil, "")
+	s.keepLocal()
 	s.log.Info("выполнен выход из аккаунта")
 	return nil
 }

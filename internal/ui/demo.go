@@ -10,6 +10,10 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/library"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/lyrics"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/moments"
 )
 
 type Demo struct {
@@ -30,6 +34,14 @@ type Demo struct {
 	volume    int
 	listening int
 	nextID    int
+
+	lib *library.Store
+
+	phone      *Phone
+	phoneToken string
+
+	closed []string
+	manual *moments.Moment
 }
 
 func NewDemo(loggedIn, offline bool) *Demo {
@@ -37,12 +49,13 @@ func NewDemo(loggedIn, offline bool) *Demo {
 	at := func(h, m int) time.Time {
 		return time.Date(now.Year(), now.Month(), now.Day(), h, m, 0, 0, time.Local)
 	}
-	d := &Demo{loggedIn: loggedIn, offline: offline, start: now}
+	on := true
+	d := &Demo{loggedIn: loggedIn, offline: offline, start: now, lib: demoLibrary(now)}
 	d.recent = []Scrobble{
-		{ID: 1284, Started: at(18, 41), Artist: "Lana Del Rey", Title: "Summertime Sadness", Status: "sent"},
-		{ID: 1283, Started: at(18, 37), Artist: "MGK", Title: "bloody valentine", Status: "sent"},
-		{ID: 1282, Started: at(18, 34), Artist: "Ninajirachi", Title: "iPod Touch", Status: "sent"},
-		{ID: 1281, Started: at(18, 32), Artist: "Charli XCX", Title: "360", Status: "sent"},
+		{ID: 1284, Started: at(18, 41), Artist: "Lana Del Rey", Title: "Summertime Sadness", Album: "Born to Die", Status: "sent"},
+		{ID: 1283, Started: at(18, 37), Artist: "MGK", Title: "bloody valentine", Album: "Tickets to My Downfall", Status: "sent"},
+		{Started: at(18, 34), Artist: "Ninajirachi", Title: "iPod Touch", Album: "I Love My Computer", Status: "lastfm"},
+		{ID: 1281, Started: at(18, 32), Artist: "Charli XCX", Title: "360", Album: "BRAT", Status: "sent"},
 	}
 	if offline {
 		d.queue = []QueueItem{
@@ -60,6 +73,8 @@ func NewDemo(loggedIn, offline bool) *Demo {
 			{Name: "firefox", Identity: "Firefox", Enabled: true},
 		},
 		Autostart: true, CanAutostart: true, LogDir: `%LOCALAPPDATA%\lastfm-scrobbler`,
+		Theme: DefaultTheme, Bursts: &on,
+		LyricsDir: `C:\Users\Даша\Music\Lyrics`, LyricsAuto: `C:\Users\Даша\Music\Lyrics`,
 	}
 	d.stations = []Station{
 		{ID: "1", Name: "Groove Salad (SomaFM)", URL: "https://ice2.somafm.com/groovesalad-128-mp3"},
@@ -92,22 +107,41 @@ func (d *Demo) State() State {
 		User:     "listener",
 		Since:    time.Date(2026, 10, 12, 20, 0, 0, 0, time.Local),
 		Paused:   d.paused,
+		Theme:    Theme(d.settings.Theme),
+		Bursts:   d.settings.Bursts == nil || *d.settings.Bursts,
 		Now: &NowPlaying{
 			Player: "Spotify", Status: "playing",
 			Artist: "100 gecs", Title: "ringtone (remix) [feat. Charli XCX, Rico Nasty, Kero Kero Bonito]",
 			Album: "1000 gecs and the Tree of Clues", Length: 215, Played: played, Target: 107.5,
+			Position: played, Synced: true, Left: max(107.5-played, 0),
 			Scrobbled: played >= 107.5, Scrobblable: true,
+			Charts: d.lib.Ranks("100 gecs", "ringtone (remix) [feat. Charli XCX, Rico Nasty, Kero Kero Bonito]",
+				"1000 gecs and the Tree of Clues", time.Now(), nil),
+			Loved:  d.loggedIn,
+			Moment: d.moment(),
+			Tags:   []string{"hyperpop", "electronic", "experimental"},
 		},
 		Link:     link,
 		QueueLen: len(d.queue),
 		Today:    Totals{Count: 23, Seconds: 83 * 60},
 		All:      Totals{Count: 1284, Seconds: 1284 * 200},
-		Recent:   append([]Scrobble(nil), d.recent...),
+		Recent:   d.local(append([]Scrobble(nil), d.recent...)),
+		Closed:   append([]string{}, d.closed...),
+	}
+	if !d.loggedIn {
+		st.User, st.QueueLen = "", 0
 	}
 	if !d.waiting.IsZero() {
 		st.Login = &LoginState{URL: "https://www.last.fm/api/auth/"}
 	}
 	st.Radio = RadioState{Volume: d.volume, Last: d.radioLast, Count: len(d.stations)}
+	st.Library = library.Status{State: library.StateOff}
+	if d.loggedIn {
+		n := d.lib.Len()
+		synced := d.start
+		st.Library = library.Status{State: library.StateReady, Plays: n, Total: n, SyncedAt: &synced}
+		st.All.Count = n
+	}
 	if d.radioOn {
 		for _, s := range d.stations {
 			if s.ID == d.radioID {
@@ -125,6 +159,9 @@ func (d *Demo) State() State {
 func (d *Demo) Queue() []QueueItem {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	if !d.loggedIn {
+		return nil
+	}
 	return append([]QueueItem(nil), d.queue...)
 }
 
@@ -179,6 +216,17 @@ func (d *Demo) Settings() Settings {
 func (d *Demo) SaveSettings(_ context.Context, s Settings) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	if s.Theme == "" {
+		s.Theme = d.settings.Theme
+	}
+	if s.Bursts == nil {
+		s.Bursts = d.settings.Bursts
+	}
+	s.Theme = Theme(s.Theme)
+	s.LyricsAuto = d.settings.LyricsAuto
+	if s.LyricsDir = strings.TrimSpace(s.LyricsDir); s.LyricsDir == "" {
+		s.LyricsDir = s.LyricsAuto
+	}
 	d.settings = s
 	return nil
 }
@@ -348,4 +396,141 @@ func (d *Demo) RadioStream(w http.ResponseWriter, r *http.Request, id string) {
 		case <-time.After(time.Second):
 		}
 	}
+}
+
+func (d *Demo) demoPlays() []library.Play {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	out := make([]library.Play, 0, len(d.recent))
+	for _, r := range d.recent {
+		if r.Status != "ignored" {
+			out = append(out, library.Play{At: r.Started, Artist: r.Artist, Title: r.Title, Album: r.Album})
+		}
+	}
+	return out
+}
+
+func (d *Demo) Top(kind, period string, offset int) (library.Top, error) {
+	return d.lib.Top(kind, period, offset, time.Now(), d.demoPlays())
+}
+
+func (d *Demo) Card(kind, artist, title, album string) (library.Card, error) {
+	return d.lib.Card(kind, artist, title, album, time.Now(), d.demoPlays())
+}
+
+func (d *Demo) ReloadLibrary() error { return nil }
+
+var demoLines = []string{
+	"Это демо окна «Текст песни»",
+	"Настоящий текст программа найдёт сама:",
+	"в файле .lrc рядом с песней,",
+	"в тегах самого файла",
+	"или на сайте lrclib.net",
+	"",
+	"Строка, которая звучит сейчас,",
+	"подсвечивается вместе с музыкой,",
+	"а окно прокручивается само",
+	"Покрутите колёсико — прокрутка подождёт",
+	"и через пять секунд вернётся к песне",
+	"",
+	"Если у текста нет отметок времени,",
+	"он показывается целиком",
+	"Если текста нигде нет,",
+	"кнопка откроет поиск в браузере",
+	"",
+	"Ненужное окно закрывается крестиком,",
+	"а вернуть его можно кнопкой внизу",
+	"Конец демонстрации",
+}
+
+func (d *Demo) Lyrics() Lyrics {
+	n := d.State().Now
+	out := Lyrics{Artist: n.Artist, Title: n.Title, Album: n.Album, State: lyrics.Found}
+	for i, text := range demoLines {
+		out.Synced = append(out.Synced, lyrics.Line{At: float64(4 + 6*i), Text: text})
+	}
+	out.Plain = strings.Join(demoLines, "\n")
+	out.Source = "demo"
+	return out
+}
+
+const demoLength = 215.0
+
+func (d *Demo) moment() *moments.Moment {
+	if d.manual != nil {
+		m := *d.manual
+		return &m
+	}
+	return &moments.Moment{Start: 64, End: 88}
+}
+
+func (d *Demo) SetMoment(r MomentRequest) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if r.Clear {
+		d.manual = nil
+		return nil
+	}
+	end := min(r.End, demoLength)
+	if r.Start < 0 || r.Start >= demoLength || end-r.Start < 1 {
+		return errors.New("момент должен быть внутри трека и длиться хотя бы секунду")
+	}
+	d.manual = &moments.Moment{Start: r.Start, End: end, Manual: true}
+	return nil
+}
+
+func (d *Demo) Recs() Recs {
+	n := d.State().Now
+	artists := []RecArtist{{Name: "SOPHIE", Match: 1}, {Name: "Dorian Electra", Match: 0.88}, {Name: "A. G. Cook", Match: 0.83},
+		{Name: "Laura Les", Match: 0.79}, {Name: "Charli XCX", Match: 0.74}}
+	tracks := []RecTrack{{Title: "Immaterial", Artist: "SOPHIE", Match: 0.97}, {Title: "Flamboyant", Artist: "Dorian Electra", Match: 0.92},
+		{Title: "Beautiful", Artist: "A. G. Cook", Match: 0.9}, {Title: "Haunted", Artist: "Laura Les", Match: 0.88},
+		{Title: "Von dutch", Artist: "Charli XCX", Match: 0.86}}
+	names := make([]string, len(artists))
+	for i, a := range artists {
+		names[i] = a.Name
+	}
+	songs := make([]library.Play, len(tracks))
+	for i, t := range tracks {
+		songs[i] = library.Play{Artist: t.Artist, Title: t.Title}
+	}
+	ac, tc := d.lib.PlayCounts(names, songs, nil)
+	for i := range artists {
+		artists[i].Plays = ac[i]
+	}
+	for i := range tracks {
+		tracks[i].Plays = tc[i]
+	}
+	return Recs{State: RecsFound, Artist: n.Artist, Title: n.Title, Artists: artists, Tracks: tracks}
+}
+
+func (d *Demo) OpenLastfm(artist, track string) error {
+	if strings.TrimSpace(artist) == "" {
+		return errors.New("неизвестный исполнитель")
+	}
+	return nil
+}
+
+func (d *Demo) SetClosed(panels []string) error {
+	d.mu.Lock()
+	d.closed = append([]string(nil), panels...)
+	d.mu.Unlock()
+	return nil
+}
+
+func (d *Demo) SyncLibrary() {}
+
+func (d *Demo) local(list []Scrobble) []Scrobble {
+	if d.loggedIn {
+		return list
+	}
+	out := list[:0]
+	for _, s := range list {
+		if s.Status == "lastfm" {
+			continue
+		}
+		s.Status = "local"
+		out = append(out, s)
+	}
+	return out
 }

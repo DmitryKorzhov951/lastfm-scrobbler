@@ -41,9 +41,12 @@ var (
 	procGetSystemMetrics              = user32.NewProc("GetSystemMetrics")
 	procSetProcessDpiAwarenessContext = user32.NewProc("SetProcessDpiAwarenessContext")
 	procSetProcessDPIAware            = user32.NewProc("SetProcessDPIAware")
+	procMessageBoxW                   = user32.NewProc("MessageBoxW")
+	procSetClassLongPtrW              = user32.NewProc("SetClassLongPtrW")
 
 	procExtractIconExW        = windows.NewLazySystemDLL("shell32.dll").NewProc("ExtractIconExW")
 	procCreateSolidBrush      = windows.NewLazySystemDLL("gdi32.dll").NewProc("CreateSolidBrush")
+	procDeleteObject          = windows.NewLazySystemDLL("gdi32.dll").NewProc("DeleteObject")
 	procGetDpiForMonitor      = windows.NewLazySystemDLL("shcore.dll").NewProc("GetDpiForMonitor")
 	procDwmSetWindowAttribute = windows.NewLazySystemDLL("dwmapi.dll").NewProc("DwmSetWindowAttribute")
 	procCoInitializeEx        = windows.NewLazySystemDLL("ole32.dll").NewProc("CoInitializeEx")
@@ -54,39 +57,51 @@ const (
 	wsClipChildren = 0x02000000
 	wsSysMenu      = 0x00080000
 	wsMinimizeBox  = 0x00020000
-	wsMaximizeBox  = 0x00010000
 	wsExAppWindow  = 0x00040000
+	wsExTopmost    = 0x00000008
 
-	wmMove           = 0x0003
-	wmSize           = 0x0005
-	wmActivate       = 0x0006
-	wmClose          = 0x0010
-	wmShowWindow     = 0x0018
-	wmGetMinMaxInfo  = 0x0024
-	wmNCLButtonDown  = 0x00A1
-	wmMoving         = 0x0216
-	wmDPIChanged     = 0x02E0
-	wmApp            = 0x8000
-	wmDestroy        = 0x0002
-	waInactive       = 0
-	sizeRestored     = 0
-	sizeMinimized    = 1
-	sizeMaximized    = 2
-	swHide           = 0
-	swShowNormal     = 1
-	swShowMaximized  = 3
-	swShow           = 5
-	swMinimize       = 6
-	swRestore        = 9
-	swpNoZOrder      = 0x0004
-	swpNoActivate    = 0x0010
-	monitorToNull    = 0
-	monitorToNearest = 2
-	idcArrow         = 32512
-	smSwapButton     = 23
-	vkLButton        = 0x01
-	vkRButton        = 0x02
-	asfwAny          = ^uintptr(0)
+	wmMove            = 0x0003
+	wmSize            = 0x0005
+	wmActivate        = 0x0006
+	wmClose           = 0x0010
+	wmShowWindow      = 0x0018
+	wmGetMinMaxInfo   = 0x0024
+	wmNCLButtonDown   = 0x00A1
+	wmMoving          = 0x0216
+	wmSizing          = 0x0214
+	wmszLeft          = 1
+	wmszTop           = 3
+	wmszTopLeft       = 4
+	wmszTopRight      = 5
+	wmszBottom        = 6
+	wmszBottomLeft    = 7
+	wmDPIChanged      = 0x02E0
+	wmApp             = 0x8000
+	wmDestroy         = 0x0002
+	waInactive        = 0
+	sizeRestored      = 0
+	sizeMinimized     = 1
+	sizeMaximized     = 2
+	swHide            = 0
+	swShowNormal      = 1
+	swShowMaximized   = 3
+	swShow            = 5
+	swMinimize        = 6
+	swRestore         = 9
+	swpNoSize         = 0x0001
+	swpNoMove         = 0x0002
+	swpNoZOrder       = 0x0004
+	swpNoActivate     = 0x0010
+	hwndTopmost       = ^uintptr(0)
+	hwndNotopmost     = ^uintptr(1)
+	gclpHbrBackground = ^uintptr(9)
+	monitorToNull     = 0
+	monitorToNearest  = 2
+	idcArrow          = 32512
+	smSwapButton      = 23
+	vkLButton         = 0x01
+	vkRButton         = 0x02
+	asfwAny           = ^uintptr(0)
 
 	htCaption     = 2
 	htLeft        = 10
@@ -209,6 +224,27 @@ func setDPIAware() {
 }
 
 func allowForeground() { procAllowSetForegroundWindow.Call(asfwAny) }
+
+const (
+	mbYesNo         = 0x00000004
+	mbIconWarning   = 0x00000030
+	mbSetForeground = 0x00010000
+	mbTopmost       = 0x00040000
+	idYes           = 6
+)
+
+func messageBox(title, text string, flags uintptr) int {
+	t, err := windows.UTF16PtrFromString(title)
+	if err != nil {
+		return 0
+	}
+	m, err := windows.UTF16PtrFromString(text)
+	if err != nil {
+		return 0
+	}
+	r, _, _ := procMessageBoxW.Call(0, uintptr(unsafe.Pointer(m)), uintptr(unsafe.Pointer(t)), flags)
+	return int(r)
+}
 
 func findAppWindow(pid uint32) uintptr {
 	cls, _ := windows.UTF16PtrFromString(windowClass)

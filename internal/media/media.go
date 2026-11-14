@@ -14,19 +14,14 @@ const (
 	Unknown Status = ""
 )
 
-const noTrackID = "/org/mpris/MediaPlayer2/TrackList/NoTrack"
-
 type Track struct {
-	TrackID      string
 	Title        string
 	Artists      []string
 	AlbumArtists []string
 	Album        string
 	Length       time.Duration
 	TrackNumber  int
-	MBID         string
 	URL          string
-	ArtURL       string
 
 	Live bool
 }
@@ -44,9 +39,6 @@ func (t Track) Valid() bool {
 }
 
 func (t Track) Key() string {
-	if t.TrackID != "" && t.TrackID != noTrackID {
-		return t.TrackID + "\x00" + t.Title
-	}
 	return strings.Join([]string{t.Artist(), t.Title, t.Album}, "\x00")
 }
 
@@ -69,7 +61,12 @@ type State struct {
 
 	PositionFresh bool
 
+	PositionKnown    bool
+	PositionReported time.Time
+
 	FromStart bool
+
+	Art []byte
 }
 
 func firstNonEmpty(list []string) string {

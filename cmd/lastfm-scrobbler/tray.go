@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 
 	"fyne.io/systray"
+
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/version"
 )
 
 //go:embed assets
@@ -34,8 +36,8 @@ func runTray(ctx context.Context, svc *service, e *env, open func()) {
 
 func trayMenu(ctx context.Context, svc *service, e *env, open func()) {
 	systray.SetIcon(trayIcon(false))
-	systray.SetTitle("Скробблер Last.fm")
-	systray.SetTooltip("Скробблер Last.fm")
+	systray.SetTitle(version.Name)
+	systray.SetTooltip(version.Name)
 	systray.SetOnTapped(open)
 
 	track := systray.AddMenuItem("Ничего не играет", "")
@@ -162,8 +164,6 @@ func buildTrayView(b *uiBackend) trayView {
 		v.track = shorten(n.Artist+" — "+n.Title, 60)
 	}
 	switch {
-	case !st.LoggedIn:
-		v.info = "Вход не выполнен — откройте окно"
 	case st.Paused:
 		v.info = "Скробблинг приостановлен"
 	case st.Now != nil && st.Now.Status == "playing":
@@ -174,7 +174,7 @@ func buildTrayView(b *uiBackend) trayView {
 		case n.Scrobbled:
 			v.info = n.Player + " · засчитано"
 		default:
-			v.info = n.Player + " · засчитается через " + fmtDuration(time.Duration((n.Target-n.Played)*float64(time.Second)))
+			v.info = n.Player + " · засчитается через " + fmtDuration(time.Duration(n.Left*float64(time.Second)))
 		}
 	case st.Link.State == "offline":
 		v.info = fmt.Sprintf("Нет связи с Last.fm · в очереди %d", st.QueueLen)
@@ -183,7 +183,7 @@ func buildTrayView(b *uiBackend) trayView {
 	default:
 		v.info = fmt.Sprintf("Сегодня засчитано: %d", st.Today.Count)
 	}
-	v.tooltip = shorten("Скробблер Last.fm\n"+v.track, 120)
+	v.tooltip = shorten(version.Name+"\n"+v.track, 120)
 
 	r := st.Radio
 	switch {
@@ -217,4 +217,18 @@ func shorten(s string, n int) string {
 	}
 	r := []rune(s)
 	return string(r[:n-1]) + "…"
+}
+
+func fmtDuration(d time.Duration) string {
+	if d <= 0 {
+		return "0:00"
+	}
+	d = (d + time.Second - 1).Truncate(time.Second)
+	h := int(d / time.Hour)
+	m := int(d % time.Hour / time.Minute)
+	s := int(d % time.Minute / time.Second)
+	if h > 0 {
+		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
+	}
+	return fmt.Sprintf("%d:%02d", m, s)
 }

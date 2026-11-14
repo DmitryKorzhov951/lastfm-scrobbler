@@ -14,6 +14,7 @@ type Options struct {
 	Percent           float64
 	NowPlayingRefresh time.Duration
 	MaxGap            time.Duration
+	MinListen         time.Duration
 	SkipUnknownLength bool
 
 	IgnoreInitialPosition bool
@@ -26,6 +27,7 @@ func DefaultOptions() Options {
 		Percent:           0.5,
 		NowPlayingRefresh: 4 * time.Minute,
 		MaxGap:            15 * time.Second,
+		MinListen:         30 * time.Second,
 		SkipUnknownLength: false,
 	}
 }
@@ -46,6 +48,9 @@ func (o *Options) normalize() {
 	}
 	if o.MaxGap <= 0 {
 		o.MaxGap = d.MaxGap
+	}
+	if o.MinListen <= 0 {
+		o.MinListen = d.MinListen
 	}
 }
 
@@ -69,6 +74,15 @@ type playerState struct {
 	nowPlayAt time.Time
 	scrobbled bool
 	fromStart bool
+
+	seenAt  time.Time
+	initial bool
+	pos     time.Duration
+	posOK   bool
+	repAt   time.Time
+	livePos time.Duration
+	liveAt  time.Time
+	frozen  time.Duration
 }
 
 type Engine struct {
@@ -128,6 +142,7 @@ func (e *Engine) Update(st media.State) {
 
 	prev := ps.status
 	ps.status = st.Status
+	e.notePosition(ps, st, prev == media.Playing)
 
 	if st.Status == media.Playing {
 		if prev != media.Playing || e.active == "" || !e.isPlaying(e.active) {
@@ -151,34 +166,134 @@ func (e *Engine) Tick(now time.Time) {
 }
 
 type Snapshot struct {
+	ID        string
 	Player    string
 	Identity  string
 	Active    bool
 	Status    media.Status
 	Track     media.Track
 	Played    time.Duration
+	Position  time.Duration
+	Synced    bool
 	Target    time.Duration
+	Left      time.Duration
 	Scrobbld  bool
 	FromStart bool
 }
 
 func (e *Engine) Snapshots() []Snapshot {
+	return e.SnapshotsAt(time.Now())
+}
+
+func (e *Engine) SnapshotsAt(now time.Time) []Snapshot {
 	out := make([]Snapshot, 0, len(e.players))
 	for id, ps := range e.players {
-		target, _ := e.threshold(ps.track)
+		target, ok := e.threshold(ps.track)
+		pos, synced := e.position(ps, now)
+		if !synced {
+			pos = ps.played
+		}
+		var left time.Duration
+		if ok && !ps.scrobbled {
+			left = max(e.remaining(ps, now, target), 0)
+		}
 		out = append(out, Snapshot{
+			ID:        id,
 			Player:    ps.name,
 			Identity:  ps.identity,
 			Active:    id == e.active,
 			Status:    ps.status,
 			Track:     ps.track,
 			Played:    ps.played,
+			Position:  pos,
+			Synced:    synced,
 			Target:    target,
+			Left:      left,
 			Scrobbld:  ps.scrobbled,
 			FromStart: ps.fromStart,
 		})
 	}
 	return out
+}
+
+const (
+	positionSlack = 5 * time.Second
+	stillMoving   = 500 * time.Millisecond
+	frozenAfter   = 3 * time.Second
+)
+
+func (e *Engine) notePosition(ps *playerState, st media.State, wasPlaying bool) {
+	if !st.PositionKnown || st.Track.Live || !ps.track.Valid() {
+		return
+	}
+	if l := st.Track.Length; l > 0 && st.Position > l+2*time.Second {
+		return
+	}
+	if rep := st.PositionReported; !rep.IsZero() {
+		if rep.Equal(ps.repAt) {
+			return
+		}
+		ps.repAt = rep
+		if !ps.initial && rep.Before(ps.seenAt) && st.Position > st.At.Sub(ps.seenAt)+positionSlack {
+			return
+		}
+	} else if e.frozenLive(ps, st, wasPlaying) {
+		ps.posOK = false
+		return
+	}
+	first := !ps.posOK
+	ps.pos, ps.posOK = st.Position, true
+	if first && !ps.scrobbled && st.At.Sub(ps.seenAt) <= positionSlack {
+		if started := st.At.Add(-st.Position); started.Before(ps.startedAt) {
+			ps.startedAt = started
+		}
+	}
+}
+
+func (e *Engine) frozenLive(ps *playerState, st media.State, wasPlaying bool) bool {
+	if !ps.liveAt.IsZero() {
+		el := st.At.Sub(ps.liveAt)
+		if el >= 0 && el < stillMoving {
+			return ps.frozen >= frozenAfter
+		}
+		if wasPlaying && st.Status == media.Playing {
+			if moved := st.Position - ps.livePos; moved > -stillMoving && moved < stillMoving {
+				ps.frozen += el
+			} else {
+				ps.frozen = 0
+			}
+		}
+	}
+	ps.livePos, ps.liveAt = st.Position, st.At
+	return ps.frozen >= frozenAfter
+}
+
+func (e *Engine) position(ps *playerState, now time.Time) (time.Duration, bool) {
+	if !ps.posOK {
+		return 0, false
+	}
+	p := ps.pos
+	if ps.status == media.Playing && now.After(ps.lastTick) {
+		p += min(now.Sub(ps.lastTick), e.opts.MaxGap)
+	}
+	if l := ps.track.Length; l > 0 && p > l {
+		p = l
+	}
+	return p, true
+}
+
+func (e *Engine) remaining(ps *playerState, now time.Time, target time.Duration) time.Duration {
+	left := target - ps.played
+	if pos, ok := e.position(ps, now); ok {
+		byPos := target - pos
+		if guard := min(e.opts.MinListen, target) - ps.played; byPos < guard {
+			byPos = guard
+		}
+		if byPos < left {
+			left = byPos
+		}
+	}
+	return left
 }
 
 func (e *Engine) remove(id string) {
@@ -194,6 +309,7 @@ func (e *Engine) isPlaying(id string) bool {
 }
 
 func (e *Engine) startTrack(ps *playerState, st media.State) {
+	ps.initial = ps.trackKey == ""
 	ps.track = st.Track
 	ps.trackKey = st.Track.Key()
 	ps.played = 0
@@ -201,6 +317,9 @@ func (e *Engine) startTrack(ps *playerState, st media.State) {
 	ps.nowPlayAt = time.Time{}
 	ps.lastTick = st.At
 	ps.fromStart = st.Track.Live && st.FromStart
+	ps.seenAt = st.At
+	ps.posOK = false
+	ps.liveAt, ps.frozen = time.Time{}, 0
 
 	if e.opts.IgnoreInitialPosition && !(st.PositionFresh && st.Position <= maxCatchUp) {
 		ps.startedAt = st.At
@@ -272,7 +391,13 @@ func (e *Engine) advance(ps *playerState, now time.Time) {
 	if d > e.opts.MaxGap {
 		d = e.opts.MaxGap
 	}
-	if ps.status == media.Playing && e.active == ps.id {
+	if ps.status != media.Playing {
+		return
+	}
+	if ps.posOK {
+		ps.pos += d
+	}
+	if e.active == ps.id {
 		ps.played += d
 	}
 }
@@ -308,7 +433,7 @@ func (e *Engine) check(ps *playerState, now time.Time) {
 		return
 	}
 	target, ok := e.threshold(ps.track)
-	if !ok || ps.played < target {
+	if !ok || e.remaining(ps, now, target) > 0 {
 		return
 	}
 
@@ -317,11 +442,16 @@ func (e *Engine) check(ps *playerState, now time.Time) {
 	if ts.After(now) || ts.IsZero() {
 		ts = now
 	}
-	e.log.Info("трек засчитан",
+	args := []any{
 		"player", ps.name,
 		"track", ps.track.String(),
 		"played", ps.played.Round(time.Second),
-		"target", target.Round(time.Second))
+		"target", target.Round(time.Second),
+	}
+	if pos, ok := e.position(ps, now); ok {
+		args = append(args, "position", pos.Round(time.Second))
+	}
+	e.log.Info("трек засчитан", args...)
 	e.sink.Scrobble(lastfm.Scrobble{Track: toLastfm(ps.track), Timestamp: ts.UTC(), Radio: ps.track.Live})
 }
 
@@ -333,6 +463,5 @@ func toLastfm(t media.Track) lastfm.Track {
 		AlbumArtist: t.AlbumArtist(),
 		Duration:    t.Length,
 		TrackNumber: t.TrackNumber,
-		MBID:        t.MBID,
 	}
 }

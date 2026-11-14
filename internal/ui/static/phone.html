@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#C35BB2">
+<meta name="referrer" content="no-referrer">
+<title>Следилка за музыкой</title>
+<link rel="icon" href="static/icon.png">
+<link rel="stylesheet" href="static/theme.css">
+<link rel="stylesheet" href="static/phone.css">
+<script src="static/glitch.js" defer></script>
+<script src="static/phone.js" defer></script>
+</head>
+<body>
+<header class="bar"><span>Следилка за музыкой</span><span class="user" id="user"></span></header>
+<main>
+  <section class="window">
+    <div class="titlebar">Сейчас играет</div>
+    <div class="wbody" id="now">
+      <div class="chip-line"><div class="chip" id="chip" hidden></div><span class="hot love" id="love" hidden></span></div>
+      <div class="title" id="title">Подключаюсь…</div>
+      <div class="artist" id="artist"></div>
+      <div class="album muted" id="album"></div>
+      <div class="hots" id="hots" hidden></div>
+      <div class="progress" id="progress" hidden><div id="bar"></div><span class="moment-played" id="momPlayed" hidden></span><span class="moment-ahead" id="momAhead" hidden></span><span class="mheart" id="heartA" hidden></span><span class="mheart" id="heartB" hidden></span></div>
+      <div class="row" id="times" hidden><span class="muted" id="time"></span><span class="note" id="left"></span></div>
+      <div class="moment-note" id="momentNote" hidden></div>
+      <div class="today muted" id="today"></div>
+    </div>
+  </section>
+  <section class="window">
+    <div class="titlebar">Мои прослушивания</div>
+    <div class="wbody">
+      <div class="tabs" role="tablist">
+        <button data-tab="history" aria-pressed="true">история</button>
+        <button data-tab="top" aria-pressed="false">топ треков</button>
+      </div>
+      <div id="pane-history"><div class="list" id="history"><p class="empty muted">Загружаю…</p></div></div>
+      <div id="pane-top" hidden>
+        <div class="periods">
+          <button data-period="week" aria-pressed="true">неделя</button>
+          <button data-period="month" aria-pressed="false">месяц</button>
+          <button data-period="year" aria-pressed="false">год</button>
+          <button data-period="all" aria-pressed="false">всё время</button>
+        </div>
+        <div class="period-label muted" id="periodLabel"></div>
+        <div class="list top" id="top"><p class="empty muted">Загружаю…</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer id="foot"></footer>
+</body>
+</html>

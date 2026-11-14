@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/sys/windows"
@@ -22,18 +22,6 @@ import (
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/config"
 )
 
-const platformName = "Windows"
-
-const platformCommands = `  start     запустить программу в фоне: значок в трее, окно — по щелчку
-  stop      остановить работающую программу (очередь будет дослана)
-  autostart автозапуск при входе в Windows: on | off | status
-  run       работать в этой консоли без окна, выход — Ctrl+C
-`
-
-const platformExamples = `  lastfm-scrobbler start                запустить в фоне
-  lastfm-scrobbler autostart on         запускать при входе в Windows
-`
-
 const (
 	instanceMutex = `Local\lastfm-scrobbler-instance`
 	stopEvent     = `Local\lastfm-scrobbler-stop`
@@ -41,8 +29,6 @@ const (
 
 	runKeyPath   = `Software\Microsoft\Windows\CurrentVersion\Run`
 	runValueName = "lastfm-scrobbler"
-
-	backgroundExe = "lastfm-scrobblerw.exe"
 
 	logName    = "lastfm-scrobbler.log"
 	logMaxSize = 5 << 20
@@ -56,25 +42,12 @@ func acquireInstance() (func(), error) {
 	h, err := windows.CreateMutex(nil, false, name)
 	if errors.Is(err, windows.ERROR_ALREADY_EXISTS) {
 		windows.CloseHandle(h)
-		return nil, errors.New("скробблер уже запущен (остановить: lastfm-scrobbler stop)")
+		return nil, errors.New("скробблер уже запущен")
 	}
 	if err != nil {
 		return nil, fmt.Errorf("создание мьютекса экземпляра: %w", err)
 	}
 	return func() { windows.CloseHandle(h) }, nil
-}
-
-func isRunning() bool {
-	name, err := windows.UTF16PtrFromString(instanceMutex)
-	if err != nil {
-		return false
-	}
-	h, err := windows.OpenMutex(windows.SYNCHRONIZE, false, name)
-	if err != nil {
-		return false
-	}
-	windows.CloseHandle(h)
-	return true
 }
 
 func watchStop(ctx context.Context) <-chan struct{} {
@@ -147,111 +120,17 @@ func setupBackground() error {
 	return nil
 }
 
-func selfDir() (string, string, error) {
-	self, err := os.Executable()
-	if err != nil {
-		return "", "", err
-	}
-	return self, filepath.Dir(self), nil
-}
-
-func customConfigArgs(e *env) []string {
-	def, err := config.Path()
-	if err == nil && strings.EqualFold(filepath.Clean(def), filepath.Clean(e.cfgPath)) {
-		return nil
-	}
-	return []string{"-config", e.cfgPath}
-}
-
-func backgroundCommand(e *env) (*exec.Cmd, error) {
-	self, dir, err := selfDir()
-	if err != nil {
-		return nil, err
-	}
-	var cmd *exec.Cmd
-	if w := filepath.Join(dir, backgroundExe); fileExists(w) {
-		cmd = exec.Command(w, append(customConfigArgs(e), "-tray")...)
-	} else {
-		args := append(customConfigArgs(e), "-background", "-tray", "app")
-		cmd = exec.Command(self, args...)
-	}
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		HideWindow:    true,
-		CreationFlags: windows.CREATE_NO_WINDOW | windows.CREATE_NEW_PROCESS_GROUP,
-	}
-	return cmd, nil
-}
-
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	return err == nil && !info.IsDir()
 }
 
-func cmdStart(e *env, _ []string) error {
-	if isRunning() {
-		fmt.Println("Скробблер уже работает в фоне.")
-		return nil
-	}
-	cmd, err := backgroundCommand(e)
+func autostartCommandLine() (string, error) {
+	self, err := os.Executable()
 	if err != nil {
-		return err
+		return "", err
 	}
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("запуск фонового процесса: %w", err)
-	}
-	_ = cmd.Process.Release()
-
-	for i := 0; i < 40; i++ {
-		if isRunning() {
-			fmt.Println("Скробблер запущен: значок в трее, окно — по щелчку по значку.")
-			fmt.Println("Журнал:     ", logPath())
-			fmt.Println("Остановить:  lastfm-scrobbler stop")
-			return nil
-		}
-		time.Sleep(250 * time.Millisecond)
-	}
-	return fmt.Errorf("фоновый процесс не запустился — подробности в журнале: %s", logPath())
-}
-
-func cmdStop(_ *env, _ []string) error {
-	if !isRunning() {
-		fmt.Println("Фоновый скробблер не запущен.")
-		return nil
-	}
-	if err := requestStop(); err != nil {
-		return fmt.Errorf("не удалось подать сигнал остановки: %w", err)
-	}
-	fmt.Print("Останавливаю (досылаю очередь)...")
-	for i := 0; i < 100; i++ {
-		if !isRunning() {
-			fmt.Println(" готово.")
-			return nil
-		}
-		time.Sleep(200 * time.Millisecond)
-	}
-	fmt.Println()
-	return errors.New("скробблер не остановился за 20 секунд — завершите процесс lastfm-scrobbler в диспетчере задач; " +
-		"неотправленные прослушивания сохранены и уйдут при следующем запуске")
-}
-
-func autostartCommandLine(e *env) (cmdline string, flashes bool, err error) {
-	self, dir, err := selfDir()
-	if err != nil {
-		return "", false, err
-	}
-	quote := func(s string) string { return `"` + s + `"` }
-	extra := customConfigArgs(e)
-	for i := range extra {
-		extra[i] = quote(extra[i])
-	}
-
-	if w := filepath.Join(dir, backgroundExe); fileExists(w) {
-		parts := append([]string{quote(w)}, extra...)
-		return strings.Join(append(parts, "-tray"), " "), false, nil
-	}
-	parts := append([]string{quote(self)}, extra...)
-	parts = append(parts, "-background", "-tray", "app")
-	return strings.Join(parts, " "), true, nil
+	return `"` + self + `" -tray`, nil
 }
 
 const autostartSupported = true
@@ -270,7 +149,7 @@ func setAutostart(e *env, on bool) error {
 		}
 		return nil
 	}
-	cmdline, _, err := autostartCommandLine(e)
+	cmdline, err := autostartCommandLine()
 	if err != nil {
 		return err
 	}
@@ -291,64 +170,6 @@ func autostartValue() string {
 		return ""
 	}
 	return v
-}
-
-func cmdAutostart(e *env, args []string) error {
-	action := "status"
-	if len(args) > 0 {
-		action = args[0]
-	}
-
-	switch action {
-	case "on":
-		cmdline, flashes, err := autostartCommandLine(e)
-		if err != nil {
-			return err
-		}
-		if err := setAutostart(e, true); err != nil {
-			return err
-		}
-		fmt.Println("Автозапуск включён:", cmdline)
-		if flashes {
-			fmt.Printf("Рядом нет %s — при входе на мгновение мелькнёт окно консоли.\n", backgroundExe)
-			fmt.Println("Чтобы этого не было, положите его в ту же папку и выполните autostart on ещё раз.")
-		}
-		return nil
-
-	case "off":
-		if err := setAutostart(e, false); err != nil {
-			return err
-		}
-		fmt.Println("Автозапуск выключен.")
-		return nil
-
-	case "status":
-		if v := autostartValue(); v != "" {
-			fmt.Println("Автозапуск включён:", v)
-		} else {
-			fmt.Println("Автозапуск выключен.")
-		}
-		return nil
-
-	default:
-		return fmt.Errorf("неизвестное действие %q (доступны: on, off, status)", action)
-	}
-}
-
-func platformStatus() [][2]string {
-	running := "не запущен (запустить: lastfm-scrobbler start)"
-	if isRunning() {
-		running = "работает"
-	}
-	auto := "выключен"
-	if autostartValue() != "" {
-		auto = "включён"
-	}
-	return [][2]string{
-		{"Фоновый режим", running},
-		{"Автозапуск", auto},
-		{"Журнал", logPath()},
-	}
 }
 
 func openURL(url string) error {
@@ -419,12 +240,25 @@ func openWindow(url string) error {
 
 	cmd, err := windowCommand(url)
 	if err != nil {
-		return openAppWindow(url)
+		go windowFailed(url, "не удалось подготовить запуск окна: "+err.Error())
+		return nil
+	}
+	logPath := windowLogPath()
+	var logFile *os.File
+	if logPath != "" {
+		if f, err := os.Create(logPath); err == nil {
+			logFile = f
+			cmd.Stderr = f
+		}
 	}
 	allowForeground()
-	if err := cmd.Start(); err != nil {
-		slog.Warn("не удалось запустить окно, открываю его в Edge", "err", err)
-		return openAppWindow(url)
+	err = cmd.Start()
+	if logFile != nil {
+		logFile.Close()
+	}
+	if err != nil {
+		go windowFailed(url, "не удалось запустить процесс окна: "+err.Error())
+		return nil
 	}
 	winProc.pid = cmd.Process.Pid
 	started := time.Now()
@@ -437,32 +271,85 @@ func openWindow(url string) error {
 			return
 		}
 		var exit *exec.ExitError
-		noWebView := errors.As(err, &exit) && exit.ExitCode() == exitNoWebView
-		if noWebView || time.Since(started) < 20*time.Second {
-			slog.Warn("встроенное окно не открылось, открываю его в Edge", "err", err)
-			if err := openAppWindow(url); err != nil {
-				slog.Error("не удалось открыть окно", "err", err)
-			}
+		failed := errors.As(err, &exit) && exit.ExitCode() == exitNoWebView
+		if failed || time.Since(started) < 20*time.Second {
+			reason := windowError(logPath, err)
+			slog.Error("встроенное окно не открылось", "reason", reason, "log", logPath)
+			windowFailed(url, reason)
 		}
 	}()
 	return nil
 }
 
+func windowLogPath() string {
+	dir, err := config.StateDir()
+	if err != nil {
+		return ""
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return ""
+	}
+	return filepath.Join(dir, "window.log")
+}
+
+var failShown atomic.Bool
+
+func windowFailed(url, reason string) {
+	if !failShown.CompareAndSwap(false, true) {
+		return
+	}
+	defer failShown.Store(false)
+	text := "Окно программы не открылось.\n\nПричина: " + reason + "\n\n"
+	if strings.Contains(reason, "WebView2 Runtime") {
+		text += "Установите WebView2 Runtime с сайта Microsoft\n(developer.microsoft.com/microsoft-edge/webview2)\nи откройте окно ещё раз.\n\n"
+	}
+	if p := windowLogPath(); p != "" {
+		text += "Подробности — в файле " + p + "\n\n"
+	}
+	text += "Скробблер продолжает работать в трее. Открыть окно пока в браузере Microsoft Edge?"
+	if messageBox(windowTitle, text, mbYesNo|mbIconWarning|mbSetForeground|mbTopmost) != idYes {
+		return
+	}
+	if err := openAppWindow(url); err != nil {
+		slog.Error("не удалось открыть окно в Edge", "err", err)
+	}
+}
+
+func replaceRunning() func() {
+	if err := requestStop(); err != nil {
+		return nil
+	}
+	for i := 0; i < 120; i++ {
+		time.Sleep(250 * time.Millisecond)
+		if release, err := acquireInstance(); err == nil {
+			return release
+		}
+	}
+	return nil
+}
+
+func refreshAutostart(e *env) {
+	cur := autostartValue()
+	if cur == "" {
+		return
+	}
+	want, err := autostartCommandLine()
+	if err != nil || strings.EqualFold(cur, want) {
+		return
+	}
+	if err := setAutostart(e, true); err != nil {
+		e.log.Warn("не удалось обновить автозапуск", "err", err)
+		return
+	}
+	e.log.Info("автозапуск переключён на эту копию программы", "was", cur, "now", want)
+}
+
 func windowCommand(url string) (*exec.Cmd, error) {
-	self, dir, err := selfDir()
+	self, err := os.Executable()
 	if err != nil {
 		return nil, err
 	}
-	var cmd *exec.Cmd
-	switch w := filepath.Join(dir, backgroundExe); {
-	case backgroundBuild == "1":
-		cmd = exec.Command(self, "window")
-	case fileExists(w):
-		cmd = exec.Command(w, "window")
-	default:
-		cmd = exec.Command(self, "-background", "window")
-		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: windows.CREATE_NO_WINDOW}
-	}
+	cmd := exec.Command(self, "window")
 	cmd.Env = append(os.Environ(), envWindowURL+"="+url, envWindowParent+"="+strconv.Itoa(os.Getpid()))
 	return cmd, nil
 }
@@ -475,7 +362,8 @@ func showRunningWindow(url string) error {
 	if err := signalEvent(showEvent); err == nil {
 		return nil
 	}
-	return openAppWindow(url)
+	windowFailed(url, "работающая копия программы не ответила на просьбу открыть окно")
+	return nil
 }
 
 func watchShow(ctx context.Context) <-chan struct{} {

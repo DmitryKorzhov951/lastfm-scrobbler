@@ -65,6 +65,7 @@ const (
 	ErrCodeTokenNotAuth    = 14
 	ErrCodeTokenExpired    = 15
 	ErrCodeServiceUnavail  = 16
+	ErrCodeLoginRequired   = 17
 	ErrCodeRateLimit       = 29
 )
 
@@ -315,6 +316,106 @@ func (c *Client) Scrobble(ctx context.Context, items []Scrobble) (ScrobbleResult
 		return ScrobbleResult{}, err
 	}
 	return parseScrobbleResult(body)
+}
+
+const MaxRecentLimit = 200
+
+type RecentTrack struct {
+	Artist     string
+	Title      string
+	Album      string
+	At         time.Time
+	NowPlaying bool
+}
+
+type RecentPage struct {
+	Tracks     []RecentTrack
+	Page       int
+	TotalPages int
+	Total      int
+}
+
+func (c *Client) RecentTracks(ctx context.Context, user string, page, limit int, from, to time.Time) (RecentPage, error) {
+	if limit <= 0 || limit > MaxRecentLimit {
+		limit = MaxRecentLimit
+	}
+	if page < 1 {
+		page = 1
+	}
+	params := url.Values{}
+	params.Set("user", user)
+	params.Set("page", strconv.Itoa(page))
+	params.Set("limit", strconv.Itoa(limit))
+	if !from.IsZero() {
+		params.Set("from", strconv.FormatInt(from.Unix(), 10))
+	}
+	if !to.IsZero() {
+		params.Set("to", strconv.FormatInt(to.Unix(), 10))
+	}
+	body, err := c.call(ctx, "user.getRecentTracks", params, requestOptions{})
+	if err != nil {
+		return RecentPage{}, err
+	}
+	return parseRecentTracks(body)
+}
+
+type textField struct {
+	Text string `json:"#text"`
+}
+
+func parseRecentTracks(body []byte) (RecentPage, error) {
+	var out struct {
+		Recent struct {
+			Track json.RawMessage `json:"track"`
+			Attr  struct {
+				Page       flexInt `json:"page"`
+				TotalPages flexInt `json:"totalPages"`
+				Total      flexInt `json:"total"`
+			} `json:"@attr"`
+		} `json:"recenttracks"`
+	}
+	if err := json.Unmarshal(body, &out); err != nil {
+		return RecentPage{}, fmt.Errorf("user.getRecentTracks: разбор ответа: %w", err)
+	}
+	page := RecentPage{
+		Page:       int(out.Recent.Attr.Page),
+		TotalPages: int(out.Recent.Attr.TotalPages),
+		Total:      int(out.Recent.Attr.Total),
+	}
+	type entry struct {
+		Artist textField `json:"artist"`
+		Album  textField `json:"album"`
+		Name   string    `json:"name"`
+		Date   struct {
+			UTS flexInt `json:"uts"`
+		} `json:"date"`
+		Attr struct {
+			NowPlaying string `json:"nowplaying"`
+		} `json:"@attr"`
+	}
+	var entries []entry
+	if raw := out.Recent.Track; len(raw) > 0 && string(raw) != "null" {
+		if err := json.Unmarshal(raw, &entries); err != nil {
+			var single entry
+			if err := json.Unmarshal(raw, &single); err != nil {
+				return RecentPage{}, fmt.Errorf("user.getRecentTracks: разбор ответа: %w", err)
+			}
+			entries = []entry{single}
+		}
+	}
+	for _, e := range entries {
+		t := RecentTrack{
+			Artist:     strings.TrimSpace(e.Artist.Text),
+			Title:      strings.TrimSpace(e.Name),
+			Album:      strings.TrimSpace(e.Album.Text),
+			NowPlaying: e.Attr.NowPlaying == "true",
+		}
+		if e.Date.UTS > 0 {
+			t.At = time.Unix(int64(e.Date.UTS), 0).UTC()
+		}
+		page.Tracks = append(page.Tracks, t)
+	}
+	return page, nil
 }
 
 func parseScrobbleResult(body []byte) (ScrobbleResult, error) {

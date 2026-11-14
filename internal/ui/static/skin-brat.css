@@ -1,0 +1,494 @@
+html[data-theme="brat"] body { font: 17px/1 var(--pix); }
+
+html.framed[data-theme="brat"] body { background: var(--desk); box-shadow: inset 0 0 0 2px #000000; }
+html.framed[data-theme="brat"] #app { inset: 30px 2px 30px 2px; }
+
+html[data-theme="brat"] .frame-title {
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 28px;
+  padding: 0 4px 0 24px;
+  background: none;
+  color: #000000;
+  font-size: 16px;
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+
+html.inactive[data-theme="brat"] .frame-title { background: none; color: var(--disabled); }
+
+html[data-theme="brat"] .frame-title .tb-btn {
+  width: 28px;
+  height: 22px;
+  background: none;
+  box-shadow: none;
+  color: inherit;
+  text-decoration: none;
+}
+
+html[data-theme="brat"] .frame-title .tb-btn:hover,
+html[data-theme="brat"] .frame-title .tb-pin[aria-pressed="true"] { background: #000000; color: var(--desk); }
+html[data-theme="brat"] .frame-title .tb-btn:active:not(:disabled) { padding: 0; transform: none; }
+html[data-theme="brat"] .frame-title .tb-btn::before { content: ""; box-sizing: border-box; }
+html[data-theme="brat"] .frame-title [data-win="min"]::before { width: 12px; height: 2px; margin-top: 8px; background: currentColor; }
+html[data-theme="brat"] .frame-title [data-win="mini"]::before { width: 14px; height: 8px; margin-top: 4px; border: 2px solid currentColor; }
+html[data-theme="brat"] .frame-title [data-win="mini"][data-state="true"]::before { height: 12px; margin-top: 0; border-top-width: 4px; }
+html[data-theme="brat"] .frame-title [data-win="pin"]::before { width: 10px; height: 10px; border: 2px solid currentColor; border-radius: 50%; }
+html[data-theme="brat"] .frame-title [data-win="pin"][aria-pressed="true"]::before { background: currentColor; }
+html[data-theme="brat"] .frame-title [data-win="close"]::before { content: "\00d7"; font-size: 28px; line-height: 20px; padding-bottom: 3px; }
+
+html[data-theme="brat"] .grip-hi { fill: none; }
+
+html[data-theme="brat"] #app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 0;
+  padding: 0 24px 18px;
+}
+
+html[data-theme="brat"] #app.solo { grid-template-rows: 1fr; padding-top: 18px; }
+
+html[data-theme="brat"] .nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0 -24px 18px;
+  padding: 0 16px 10px;
+  background: var(--desk);
+  border-bottom: 3px solid #000000;
+}
+
+html[data-theme="brat"] .nav button {
+  height: 48px;
+  min-width: 0;
+  padding: 0 9px 4px;
+  gap: 0;
+  font-size: 42px;
+  letter-spacing: -1px;
+  background: none;
+  box-shadow: none;
+  color: #000000;
+  text-decoration: none;
+  filter: var(--soft);
+}
+
+html[data-theme="brat"] .nav button .pix { display: none; }
+html[data-theme="brat"] .nav button:hover:not([aria-current]) { background: none; color: #000000; box-shadow: inset 0 -4px 0 #000000; }
+html[data-theme="brat"] .nav button[aria-current="page"] { background: #000000; color: var(--desk); box-shadow: none; }
+html[data-theme="brat"] .nav button:active:not(:disabled) { padding: 0 9px 4px; transform: none; }
+
+html[data-theme="brat"] .badge {
+  align-self: flex-start;
+  min-width: 20px;
+  height: 20px;
+  margin: 4px 0 0 6px;
+  padding: 0 6px 1px;
+  border-radius: 10px;
+  background: #000000;
+  color: var(--desk);
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+html[data-theme="brat"] .nav button[aria-current="page"] .badge { background: var(--desk); color: #000000; }
+
+html[data-theme="brat"] .main { gap: 24px; }
+
+html[data-theme="brat"] .window { background: none; box-shadow: none; padding: 0; }
+html[data-theme="brat"] .main > .window ~ .window { border-top: 3px solid #000000; padding-top: 12px; }
+html[data-theme="brat"] .window-body { padding: 0; }
+
+html[data-theme="brat"] .titlebar {
+  height: auto;
+  min-height: 34px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 0;
+  background: none;
+  color: #000000;
+  font-size: 30px;
+  text-transform: lowercase;
+  letter-spacing: -0.5px;
+}
+
+html[data-theme="brat"] .titlebar > span:first-child { padding: 0 0 4px; line-height: 1; filter: var(--soft); }
+
+html[data-theme="brat"] span.tb-close { display: none; }
+
+html[data-theme="brat"] button.tb-close {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  padding: 0 0 4px !important;
+  background: none;
+  box-shadow: none;
+  color: #000000;
+  text-decoration: none;
+}
+
+html[data-theme="brat"] button.tb-close .pix { display: none; }
+html[data-theme="brat"] button.tb-close::before { content: "\00d7"; font-size: 36px; line-height: 26px; letter-spacing: 0; }
+html[data-theme="brat"] button.tb-close:hover { background: #000000; color: var(--desk); }
+html[data-theme="brat"] button.tb-close:active:not(:disabled) { padding: 0 0 4px !important; }
+
+html[data-theme="brat"] button {
+  height: 30px;
+  min-width: 0;
+  padding: 0 3px 1px;
+  gap: 6px;
+  font-size: 18px;
+  background: none;
+  box-shadow: none;
+  color: #000000;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+html[data-theme="brat"] button[class*="w1"],
+html[data-theme="brat"] button[class*="w2"],
+html[data-theme="brat"] .phone-btn { width: auto; }
+
+html[data-theme="brat"] button .pix { display: none; }
+html[data-theme="brat"] button:hover:not(:disabled) { background: #000000; color: var(--desk); text-decoration: none; }
+html[data-theme="brat"] button:active:not(:disabled) { padding: 0 3px 1px; background: #000000; color: var(--desk); box-shadow: none; transform: translate(1px, 1px); }
+html[data-theme="brat"] button:disabled { color: var(--disabled); text-decoration: none; cursor: default; }
+html[data-theme="brat"] button:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+
+html[data-theme="brat"] button.default {
+  padding: 0 16px 1px;
+  background: #000000;
+  color: var(--desk);
+  box-shadow: none;
+  text-decoration: none;
+}
+
+html[data-theme="brat"] button.default:hover:not(:disabled) { background: var(--desk); color: #000000; box-shadow: inset 0 0 0 2px #000000; }
+html[data-theme="brat"] button.default:active:not(:disabled) { padding: 0 16px 1px; box-shadow: inset 0 0 0 2px #000000; }
+html[data-theme="brat"] button.default:disabled { background: var(--disabled); color: var(--desk); }
+
+html[data-theme="brat"] .buttons { gap: 20px; }
+
+html[data-theme="brat"] input[type="text"],
+html[data-theme="brat"] input[type="password"],
+html[data-theme="brat"] select {
+  height: 30px;
+  padding: 0 2px 1px;
+  font-size: 18px;
+  background: none;
+  box-shadow: inset 0 -2px 0 #000000;
+}
+
+html[data-theme="brat"] select { padding-right: 26px; cursor: pointer; }
+html[data-theme="brat"] select option { background: var(--desk); color: #000000; }
+html[data-theme="brat"] .select-btn { top: 4px; right: 0; background: none; box-shadow: none; color: #000000; }
+
+html[data-theme="brat"] input[type="text"]:focus,
+html[data-theme="brat"] input[type="password"]:focus,
+html[data-theme="brat"] select:focus { outline: none; box-shadow: inset 0 -4px 0 #000000; }
+
+html[data-theme="brat"] input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  background: none;
+  box-shadow: inset 0 0 0 2px #000000;
+  cursor: pointer;
+}
+
+html[data-theme="brat"] input[type="checkbox"]:checked { background: #000000; box-shadow: inset 0 0 0 2px #000000, inset 0 0 0 5px var(--desk); }
+html[data-theme="brat"] input[type="checkbox"]:checked::after { display: none; }
+html[data-theme="brat"] input[type="checkbox"]:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }
+html[data-theme="brat"] label.check { gap: 10px; cursor: pointer; }
+
+html[data-theme="brat"] input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: #000000; box-shadow: none; }
+html[data-theme="brat"] input[type="range"]::-webkit-slider-thumb { width: 10px; height: 22px; margin-top: -10px; background: #000000; box-shadow: none; }
+
+html[data-theme="brat"] fieldset {
+  margin: 0;
+  padding: 10px 0 0;
+  border: 0;
+  border-top: 3px solid #000000;
+  box-shadow: none;
+}
+
+html[data-theme="brat"] fieldset + fieldset,
+html[data-theme="brat"] .settings fieldset + fieldset { margin-top: 18px; }
+html[data-theme="brat"] .settings fieldset { padding: 10px 0 0; }
+
+html[data-theme="brat"] legend {
+  float: left;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 0 0 3px;
+  background: none;
+  color: #000000;
+  font-size: 26px;
+  letter-spacing: -0.4px;
+  filter: var(--soft);
+}
+
+html[data-theme="brat"] legend + * { clear: both; }
+
+html[data-theme="brat"] .t32 { font-size: 58px; line-height: 1.08; letter-spacing: -1.6px; }
+html[data-theme="brat"] .t24 { font-size: 30px; line-height: 1.1; letter-spacing: -0.5px; }
+html[data-theme="brat"] .t32.ellipsis,
+html[data-theme="brat"] .t32 > .ellipsis { padding: 0 2px 4px 0; }
+
+html[data-theme="brat"] .t32:not(.hot-line),
+html[data-theme="brat"] .hot-line.t32 > .ellipsis,
+html[data-theme="brat"] .top-label .t24,
+html[data-theme="brat"] .card-name,
+html[data-theme="brat"] .message h2,
+html[data-theme="brat"] .welcome h1,
+html[data-theme="brat"] .mini-title { filter: var(--soft); }
+
+html[data-theme="brat"] .now { gap: 24px; }
+
+html[data-theme="brat"] .art {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border: 3px solid #000000;
+}
+
+html[data-theme="brat"] .art div {
+  padding: 12px;
+  background: var(--desk);
+  color: #000000;
+  text-align: center;
+  overflow: hidden;
+}
+
+html[data-theme="brat"] .art div .pix { display: none; }
+
+html[data-theme="brat"] .art div::after {
+  content: attr(data-t);
+  max-height: 100%;
+  font-size: 36px;
+  line-height: 0.98;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+  filter: blur(0.8px);
+}
+
+html[data-theme="brat"] .art div[data-len="s"]::after { font-size: 76px; letter-spacing: -2px; }
+html[data-theme="brat"] .art div[data-len="m"]::after { font-size: 48px; letter-spacing: -1.4px; }
+html[data-theme="brat"] .art div[data-len="xl"]::after { font-size: 26px; letter-spacing: -0.6px; }
+html[data-theme="brat"] .art div[data-t=""]::after { content: "тишина"; font-size: 56px; letter-spacing: -1.6px; }
+html[data-theme="brat"] .art:not(.art-note) div::after { content: "радио"; font-size: 64px; letter-spacing: -1.8px; }
+
+html[data-theme="brat"] .chip {
+  height: 24px;
+  padding: 0;
+  gap: 8px;
+  background: none;
+  box-shadow: none;
+  font-size: 18px;
+}
+
+html[data-theme="brat"] .chip .pix { display: none; }
+html[data-theme="brat"] .chip::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: #000000; }
+
+html[data-theme="brat"] .hot { height: 24px; padding: 0 9px 1px 7px; font-size: 16px; letter-spacing: 0; filter: none; }
+html[data-theme="brat"] .hot.top1 { background: #000000; }
+
+html[data-theme="brat"] .track-title { margin-top: 10px; }
+html[data-theme="brat"] .track-feat { margin-top: 0; font-size: 18px; color: var(--text2); }
+html[data-theme="brat"] .track-artist { margin-top: 8px; }
+html[data-theme="brat"] .track-album { margin-top: 4px; font-size: 18px; }
+
+html[data-theme="brat"] .tags { gap: 14px; margin-top: 8px; }
+html[data-theme="brat"] .tag { height: 22px; padding: 0; gap: 0; font-size: 18px; background: none; box-shadow: none; }
+html[data-theme="brat"] .tag .pix { display: none; }
+html[data-theme="brat"] .tag::before { content: "#"; }
+
+html[data-theme="brat"] .progress { background: none; box-shadow: inset 0 0 0 2px #000000; --on: 10px; --period: 10px; }
+html[data-theme="brat"] .progress.mini-bar { --on: 6px; --period: 6px; }
+html[data-theme="brat"] .progress div { background: #000000; }
+html[data-theme="brat"] .moment-ahead { background-image: linear-gradient(180deg, transparent 0 5px, var(--moment) 5px calc(100% - 5px), transparent calc(100% - 5px)); }
+html[data-theme="brat"] .mini-bar .moment-ahead { background-image: linear-gradient(180deg, transparent 0 3px, var(--moment) 3px calc(100% - 3px), transparent calc(100% - 3px)); }
+
+html[data-theme="brat"] .now-row { margin-top: 10px; }
+html[data-theme="brat"] .moment-btns { gap: 16px; }
+html[data-theme="brat"] .moment-btns button { height: 26px; padding: 0 3px 1px; }
+html[data-theme="brat"] .moment-btns button:active:not(:disabled) { padding: 0 3px 1px; }
+html[data-theme="brat"] .idle-text { font-size: 18px; }
+
+html[data-theme="brat"] .recs { gap: 28px; }
+html[data-theme="brat"] .recs-head { margin: 0 0 4px; padding-bottom: 5px; border-bottom: 2px solid #000000; font-size: 15px; }
+html[data-theme="brat"] .recs-head .pix { display: none; }
+html[data-theme="brat"] .recs-list { min-height: 150px; padding: 0; background: none; box-shadow: none; }
+
+html[data-theme="brat"] .rec {
+  height: 30px;
+  padding: 0 4px 1px 0;
+  font-size: 18px;
+  text-decoration: none;
+  border-bottom: 1px solid #000000;
+}
+
+html[data-theme="brat"] .rec:hover,
+html[data-theme="brat"] .rec:focus-visible { background: #000000; color: var(--desk); padding-left: 6px; }
+html[data-theme="brat"] .rec:active:not(:disabled) { padding: 0 4px 1px 6px; transform: none; }
+html[data-theme="brat"] .rec-meta { font-size: 15px; }
+html[data-theme="brat"] .recs-msg { padding: 8px 0; }
+
+html[data-theme="brat"] .lyrics { padding: 0; background: none; box-shadow: none; }
+html[data-theme="brat"] .lyrics:focus-visible { outline: none; }
+html[data-theme="brat"] .ly { padding: 2px 8px 3px 0; font-size: 22px; line-height: 1.15; }
+html[data-theme="brat"] .lyrics.synced .ly { padding-left: 8px; }
+html[data-theme="brat"] .lyrics.synced .ly.cur { background: #000000; color: var(--desk); }
+html[data-theme="brat"] .lyrics.synced .ly.fav.cur { background: var(--moment); color: #000000; }
+html[data-theme="brat"] .lyrics-msg { padding: 2px 0 6px; font-size: 18px; line-height: 1.25; }
+html[data-theme="brat"] .ly.gap .pix { display: none; }
+html[data-theme="brat"] .ly.gap::before { content: "\00b7\00b7\00b7"; letter-spacing: 3px; color: inherit; }
+
+html[data-theme="brat"] .table { padding: 0; background: none; box-shadow: none; }
+
+html[data-theme="brat"] .table th {
+  height: 26px;
+  padding: 0 8px 5px 0;
+  background: var(--desk);
+  color: var(--text2);
+  box-shadow: inset 0 -2px 0 #000000;
+  font-size: 15px;
+}
+
+html[data-theme="brat"] .table td { padding: 0 8px 1px 0; font-size: 18px; border-bottom: 1px solid #000000; }
+html[data-theme="brat"] .table tr:last-child td { border-bottom: 1px solid #000000; }
+html[data-theme="brat"] .table .right { padding-right: 4px; }
+html[data-theme="brat"] .table .right:first-child { padding-right: 16px; }
+html[data-theme="brat"] .table .empty td { border-bottom: 0; text-align: left; }
+
+html[data-theme="brat"] .table tr.click:hover td,
+html[data-theme="brat"] .table tr.sel td { background: #000000; color: var(--desk); border-color: #000000; }
+html[data-theme="brat"] .table tr.click:hover td:first-child,
+html[data-theme="brat"] .table tr.sel td:first-child { box-shadow: -6px 0 0 #000000; }
+html[data-theme="brat"] .table tr.click:hover .muted,
+html[data-theme="brat"] .table tr.click:hover .muted-cell,
+html[data-theme="brat"] .table tr.sel td.muted-cell { color: var(--desk); }
+html[data-theme="brat"] .table td .pix { vertical-align: -1px; }
+html[data-theme="brat"] .table tr.click:hover .meter div,
+html[data-theme="brat"] .table tr.sel .meter div { background: var(--desk); }
+
+html[data-theme="brat"] .meter { height: 14px; padding: 0; background: none; box-shadow: none; }
+html[data-theme="brat"] .meter div { background: #000000; }
+
+html[data-theme="brat"] .statusbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px 1px;
+  background: var(--desk);
+  box-shadow: inset 0 2px 0 #000000;
+  font-size: 15px;
+}
+
+html.framed[data-theme="brat"] .statusbar { left: 2px; right: 2px; bottom: 2px; height: 28px; padding: 0 24px 0; box-shadow: inset 0 2px 0 #000000; }
+html[data-theme="brat"] .statusbar div { padding: 0; box-shadow: none; }
+html[data-theme="brat"] .statusbar div + div::before { content: "/"; margin: 0 10px; color: var(--text2); }
+
+html[data-theme="brat"] .modal .window {
+  padding: 16px 20px 18px;
+  background: var(--desk);
+  box-shadow: 0 0 0 3px #000000, 12px 12px 0 3px #000000;
+}
+
+html[data-theme="brat"] .modal .message { margin: 0 0 18px; }
+html[data-theme="brat"] .message { gap: 16px; }
+html[data-theme="brat"] .message .pix { margin: 2px 0 0; }
+html[data-theme="brat"] .message h2,
+html[data-theme="brat"] .welcome h1 { margin: 0 0 8px; font: 30px/1.05 var(--pix); letter-spacing: -0.5px; }
+html[data-theme="brat"] .welcome h1 .pix { display: none; }
+html[data-theme="brat"] .message p,
+html[data-theme="brat"] .welcome p { font-size: 18px; line-height: 1.25; }
+
+html[data-theme="brat"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-theme="brat"] ::-webkit-scrollbar-track { background: none; }
+html[data-theme="brat"] ::-webkit-scrollbar-thumb { background: #000000; box-shadow: none; }
+html[data-theme="brat"] ::-webkit-scrollbar-corner { background: none; }
+html[data-theme="brat"] ::-webkit-scrollbar-button:single-button { display: none; }
+
+html[data-theme="brat"] .dock { gap: 18px; padding: 12px 0 0; background: none; box-shadow: none; border-top: 3px solid #000000; }
+html[data-theme="brat"] .dock button { height: 30px; padding: 0 3px 1px; }
+html[data-theme="brat"] .dock button::before { content: "+"; }
+html[data-theme="brat"] .dock-label { margin: 0; }
+
+html[data-theme="brat"] .avatar { background: #000000; box-shadow: none; color: var(--desk); }
+html[data-theme="brat"] .account .who { gap: 4px; }
+html[data-theme="brat"] .rule,
+html[data-theme="brat"] .rule-text,
+html[data-theme="brat"] .players,
+html[data-theme="brat"] .logs,
+html[data-theme="brat"] .keys,
+html[data-theme="brat"] .no-players,
+html[data-theme="brat"] .queue-note,
+html[data-theme="brat"] .top-lib,
+html[data-theme="brat"] .login-hint,
+html[data-theme="brat"] .form-hint,
+html[data-theme="brat"] .card-dates,
+html[data-theme="brat"] .phone-text { font-size: 18px; }
+html[data-theme="brat"] .players { gap: 12px 24px; }
+html[data-theme="brat"] .settings .window-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 40px; align-items: start; }
+html[data-theme="brat"] .settings fieldset + fieldset { margin-top: 0; }
+html[data-theme="brat"] .settings .settings-buttons { grid-column: 1 / -1; margin-top: 4px; padding-top: 14px; border-top: 3px solid #000000; }
+html[data-theme="brat"] .rule { flex-wrap: wrap; gap: 8px 14px; }
+html[data-theme="brat"] .rule .select { width: 190px; }
+html[data-theme="brat"] .sys-theme .select { flex: 1; width: auto; min-width: 0; }
+html[data-theme="brat"] .sys-row { flex-wrap: wrap; gap: 8px 12px; }
+html[data-theme="brat"] .logs { margin-top: 14px; }
+html[data-theme="brat"] .lib-line { flex: 1; }
+html[data-theme="brat"] .login .big { height: 40px; font-size: 22px; }
+html[data-theme="brat"] .settings-buttons button { min-width: 0; }
+
+html[data-theme="brat"] .radio-controls { gap: 20px; }
+html[data-theme="brat"] .radio-note { font-size: 18px; }
+
+html[data-theme="brat"] .top-bar { gap: 12px 28px; }
+html[data-theme="brat"] .seg { gap: 2px; }
+html[data-theme="brat"] .seg button { height: 32px; padding: 0 9px 2px; font-size: 22px; text-decoration: none; }
+html[data-theme="brat"] .seg button:hover:not([aria-pressed="true"]) { background: none; color: #000000; box-shadow: inset 0 -3px 0 #000000; }
+html[data-theme="brat"] .seg button[aria-pressed="true"] { padding: 0 9px 2px; background: #000000; color: var(--desk); box-shadow: none; }
+html[data-theme="brat"] .seg button:active:not(:disabled) { padding: 0 9px 2px; transform: none; }
+html[data-theme="brat"] .top-period { margin: 16px 0 10px; }
+html[data-theme="brat"] .top-period .arrow { width: 36px; height: 32px; padding: 0; box-shadow: inset 0 0 0 2px #000000; }
+html[data-theme="brat"] .top-period .arrow .pix { display: block; }
+html[data-theme="brat"] .top-period .arrow:disabled { box-shadow: inset 0 0 0 2px var(--disabled); }
+html[data-theme="brat"] .top-period .arrow:active:not(:disabled) { padding: 0; }
+html[data-theme="brat"] .table.top { min-height: 330px; }
+
+html[data-theme="brat"] .card-art { display: none; }
+html[data-theme="brat"] .card-head { margin: 0; }
+html[data-theme="brat"] .card-name { font-size: 40px; line-height: 1.02; letter-spacing: -1px; }
+html[data-theme="brat"] .card-link { font-size: 18px; }
+html[data-theme="brat"] button.link { height: auto; padding: 0; font-size: 18px; color: #000000; }
+html[data-theme="brat"] button.link:active:not(:disabled) { padding: 0; transform: none; }
+html[data-theme="brat"] .card-count { margin: 12px 0 10px; font-size: 18px; }
+html[data-theme="brat"] .card-periods { gap: 18px; }
+html[data-theme="brat"] .card-periods div { padding: 8px 0 0; gap: 4px; background: none; box-shadow: inset 0 2px 0 #000000; }
+html[data-theme="brat"] .card-list-title { margin: 0 0 4px; }
+html[data-theme="brat"] .table.mini td { height: 30px; }
+
+html[data-theme="brat"] .qr { background: #FFFFFF; box-shadow: 0 0 0 3px #000000; color: #000000; }
+html[data-theme="brat"] .qr-off { background: var(--desk); color: var(--disabled); }
+html[data-theme="brat"] .phone-box { gap: 22px; }
+
+html.mini[data-theme="brat"] #mini { inset: 30px 2px 2px 2px; padding: 2px 14px 10px; gap: 14px; background: var(--desk); }
+html[data-theme="brat"] .mini-art { width: 104px; height: 104px; padding: 0; background: none; box-shadow: none; border: 2px solid #000000; }
+html[data-theme="brat"] .mini-art div { padding: 6px; background: var(--desk); color: #000000; text-align: center; overflow: hidden; }
+html[data-theme="brat"] .mini-art div .pix { display: none; }
+html[data-theme="brat"] .mini-art div::after { content: attr(data-t); max-height: 100%; font-size: 20px; line-height: 0.98; letter-spacing: -0.5px; overflow-wrap: anywhere; filter: blur(0.6px); }
+html[data-theme="brat"] .mini-art div[data-len="s"]::after { font-size: 38px; letter-spacing: -1px; }
+html[data-theme="brat"] .mini-art div[data-len="m"]::after { font-size: 26px; }
+html[data-theme="brat"] .mini-art div[data-len="xl"]::after { font-size: 15px; letter-spacing: 0; }
+html[data-theme="brat"] .mini-art div[data-t=""]::after { content: "тишина"; font-size: 30px; }
+html[data-theme="brat"] .mini-title { margin-top: 0; height: 34px; font-size: 32px; line-height: 32px; letter-spacing: -0.8px; }
+html[data-theme="brat"] .mini-artist { margin-top: 2px; gap: 8px; }
+html[data-theme="brat"] .mini-tag { height: 18px; font-size: 17px; }
+html[data-theme="brat"] .mini-bar { margin-top: 8px; }
+html[data-theme="brat"] .mini-row { margin-top: 7px; font-size: 16px; }

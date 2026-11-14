@@ -3,9 +3,11 @@ module github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler
 go 1.23
 
 require (
+	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/go-ole/go-ole v1.2.6
-	github.com/godbus/dbus/v5 v5.2.2
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/saltosystems/winrt-go v0.0.0-20260513072510-45f10383b2b8
+	rsc.io/qr v0.2.0
 )
 
 require (

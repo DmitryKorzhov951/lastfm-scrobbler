@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -27,7 +28,10 @@ type Server struct {
 	srv     *http.Server
 	port    string
 	log     *slog.Logger
+	about   atomic.Value
 }
+
+func (s *Server) SetAbout(v any) { s.about.Store(v) }
 
 func Listen(b Backend, addr string, log *slog.Logger) (*Server, error) {
 	host, _, err := net.SplitHostPort(addr)
@@ -90,9 +94,17 @@ func (s *Server) Handler() http.Handler {
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Write(data)
+		w.Write(themed(data, s.backend.State().Theme))
 	})
 	mux.Handle("GET /static/", http.StripPrefix("/static/", files))
+	mux.HandleFunc("GET /about", func(w http.ResponseWriter, r *http.Request) {
+		v := s.about.Load()
+		if v == nil {
+			http.NotFound(w, r)
+			return
+		}
+		writeJSON(w, v)
+	})
 
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/state", s.getState)
@@ -115,9 +127,21 @@ func (s *Server) Handler() http.Handler {
 	api.HandleFunc("POST /api/radio/play", s.playRadio)
 	api.HandleFunc("POST /api/radio/stop", s.stopRadio)
 	api.HandleFunc("POST /api/radio/volume", s.radioVolume)
+	api.HandleFunc("GET /api/stats/top", s.getTop)
+	api.HandleFunc("GET /api/stats/card", s.getCard)
+	api.HandleFunc("POST /api/library/reload", s.reloadLibrary)
+	api.HandleFunc("POST /api/library/sync", s.syncLibrary)
+	api.HandleFunc("GET /api/lyrics", s.getLyrics)
+	api.HandleFunc("GET /api/recs", s.getRecs)
+	api.HandleFunc("POST /api/panels", s.setPanels)
+	api.HandleFunc("POST /api/moment", s.setMoment)
+	api.HandleFunc("GET /api/phone", s.getPhone)
+	api.HandleFunc("POST /api/phone", s.setPhone)
+	api.HandleFunc("POST /api/phone/reset", s.resetPhone)
 	mux.Handle("/api/", s.requireToken(api))
 
 	mux.HandleFunc("GET /radio/stream", s.radioStream)
+	mux.HandleFunc("GET /cover/{key}", s.cover)
 
 	return s.guard(mux)
 }
@@ -176,8 +200,54 @@ func readJSON(r *http.Request, v any) error {
 
 func ok(w http.ResponseWriter) { writeJSON(w, map[string]bool{"ok": true}) }
 
+func (s *Server) getTop(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	offset := 0
+	if v := q.Get("offset"); v != "" {
+		n, err := strconv.Atoi(v)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, errors.New("неверный номер периода"))
+			return
+		}
+		offset = n
+	}
+	top, err := s.backend.Top(q.Get("kind"), q.Get("period"), offset)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, top)
+}
+
+func (s *Server) getCard(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	card, err := s.backend.Card(q.Get("kind"), q.Get("artist"), q.Get("title"), q.Get("album"))
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, card)
+}
+
+func (s *Server) reloadLibrary(w http.ResponseWriter, r *http.Request) {
+	if err := s.backend.ReloadLibrary(); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	ok(w)
+}
+
+func (s *Server) syncLibrary(w http.ResponseWriter, r *http.Request) {
+	s.backend.SyncLibrary()
+	ok(w)
+}
+
 func (s *Server) getState(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, s.backend.State())
+	st := s.backend.State()
+	if st.Now != nil && r.URL.Query().Get("cover") == "1" {
+		st.Now.Cover = s.backend.NowCover()
+	}
+	writeJSON(w, st)
 }
 
 func (s *Server) getQueue(w http.ResponseWriter, r *http.Request) {
@@ -246,6 +316,10 @@ func (s *Server) saveSettings(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, errors.New("доля трека должна быть от 1 до 100 %: "+strconv.FormatFloat(st.Percent*100, 'f', 0, 64)))
 		return
 	}
+	if st.Theme != "" && Theme(st.Theme) != st.Theme {
+		writeError(w, http.StatusBadRequest, errors.New("неизвестная тема: "+st.Theme))
+		return
+	}
 	if err := s.backend.SaveSettings(r.Context(), st); err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return
@@ -295,16 +369,67 @@ func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 	ok(w)
 }
 
-func (s *Server) open(w http.ResponseWriter, r *http.Request) {
+func (s *Server) getLyrics(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, s.backend.Lyrics())
+}
+
+func (s *Server) getRecs(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, s.backend.Recs())
+}
+
+func (s *Server) setPanels(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		What string `json:"what"`
+		Closed []string `json:"closed"`
 	}
 	if err := readJSON(r, &req); err != nil {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
+	list, err := CleanPanels(req.Closed)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := s.backend.SetClosed(list); err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	ok(w)
+}
+
+func (s *Server) setMoment(w http.ResponseWriter, r *http.Request) {
+	var req MomentRequest
+	if err := readJSON(r, &req); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := s.backend.SetMoment(req); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	ok(w)
+}
+
+func (s *Server) open(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		What   string `json:"what"`
+		Artist string `json:"artist"`
+		Track  string `json:"track"`
+	}
+	if err := readJSON(r, &req); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	if req.What == "lastfm" {
+		if err := s.backend.OpenLastfm(req.Artist, req.Track); err != nil {
+			writeError(w, http.StatusBadRequest, err)
+			return
+		}
+		ok(w)
+		return
+	}
 	switch req.What {
-	case "profile", "keys", "logs", "auth":
+	case "profile", "keys", "logs", "auth", "lyrics", "lyricsdir":
 	default:
 		writeError(w, http.StatusBadRequest, errors.New("неизвестная страница: "+req.What))
 		return
@@ -405,6 +530,61 @@ func (s *Server) radioVolume(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ok(w)
+}
+
+func withQR(info PhoneInfo) PhoneInfo {
+	if info.URL != "" {
+		if rows, err := QRRows(info.URL); err == nil {
+			info.QR = rows
+		}
+	}
+	return info
+}
+
+func (s *Server) getPhone(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, withQR(s.backend.Phone()))
+}
+
+func (s *Server) setPhone(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Enabled bool `json:"enabled"`
+	}
+	if err := readJSON(r, &req); err != nil {
+		writeError(w, http.StatusBadRequest, err)
+		return
+	}
+	info, err := s.backend.SetPhone(req.Enabled)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, withQR(info))
+}
+
+func (s *Server) resetPhone(w http.ResponseWriter, r *http.Request) {
+	info, err := s.backend.ResetPhone()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeJSON(w, withQR(info))
+}
+
+func (s *Server) cover(w http.ResponseWriter, r *http.Request) {
+	got := []byte(r.URL.Query().Get("t"))
+	if subtle.ConstantTimeCompare(got, []byte(s.token)) != 1 {
+		http.Error(w, "нет доступа", http.StatusUnauthorized)
+		return
+	}
+	data, ct, ok := s.backend.Cover(r.PathValue("key"))
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+	h := w.Header()
+	h.Set("Content-Type", ct)
+	h.Set("Cache-Control", "private, max-age=86400, immutable")
+	w.Write(data)
 }
 
 func (s *Server) radioStream(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="940" viewBox="0 0 960 940"><defs><linearGradient id="appgrad0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B5BD6"/><stop offset="1" stop-color="#8E5BD6"/></linearGradient></defs>
+<rect x="0" y="0" width="960" height="940" fill="#F3F3F3" rx="8" stroke="#D1D1D1" stroke-width="1" id="Окно" />
+<g id="Заголовок окна">
+<g id="Значок">
+<rect x="12" y="8" width="16" height="16" fill="url(#appgrad0)" rx="3.6" />
+<rect x="16.0" y="14.5" width="2.0" height="6.0" fill="#FFFFFF" rx="1.0" />
+<rect x="19.0" y="11.5" width="2.0" height="9.0" fill="#FFFFFF" rx="1.0" />
+<rect x="22.0" y="13.5" width="2.0" height="7.0" fill="#FFFFFF" rx="1.0" />
+</g>
+<text x="38" y="21" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#1A1A1A">Скробблер Last.fm</text>
+<path d="M840 16H850" fill="none" stroke="#1A1A1A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+<rect x="886" y="11" width="10" height="10" fill="none" rx="1" stroke="#1A1A1A" stroke-width="1" />
+<path d="M932 11L942 21M942 11L932 21" fill="none" stroke="#1A1A1A" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<g id="Навигация">
+<g id="Пункт «Сейчас»">
+<g transform="translate(24,58) scale(1.0)">
+<path d="M6 12.5V3.6L13 2.2V11" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="4.4" cy="12.5" r="1.6" fill="none" stroke="#1A1A1A" stroke-width="1.5"/>
+<circle cx="11.4" cy="11" r="1.6" fill="none" stroke="#1A1A1A" stroke-width="1.5"/>
+</g>
+<text x="52" y="71" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Сейчас</text>
+</g>
+<g id="Пункт «Очередь»">
+<g transform="translate(24,98) scale(1.0)">
+<path d="M5.5 4H13.5" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="2.8" cy="4" r="0.9" fill="#1A1A1A"/>
+<path d="M5.5 8H13.5" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="2.8" cy="8" r="0.9" fill="#1A1A1A"/>
+<path d="M5.5 12H13.5" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="2.8" cy="12" r="0.9" fill="#1A1A1A"/>
+</g>
+<text x="52" y="111" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Очередь</text>
+</g>
+<g id="Пункт «Настройки»">
+<rect x="8" y="128" width="204" height="36" fill="#E9E9E9" rx="4" />
+<rect x="8" y="138" width="3" height="16" fill="#5B5BD6" rx="1.5" id="Индикатор" />
+<g transform="translate(24,138) scale(1.0)">
+<path d="M14.87,6.63 L14.87,9.37 L13.30,9.05 L12.49,11.00 L13.82,11.89 L11.89,13.82 L11.00,12.49 L9.05,13.30 L9.37,14.87 L6.63,14.87 L6.95,13.30 L5.00,12.49 L4.11,13.82 L2.18,11.89 L3.51,11.00 L2.70,9.05 L1.13,9.37 L1.13,6.63 L2.70,6.95 L3.51,5.00 L2.18,4.11 L4.11,2.18 L5.00,3.51 L6.95,2.70 L6.63,1.13 L9.37,1.13 L9.05,2.70 L11.00,3.51 L11.89,2.18 L13.82,4.11 L12.49,5.00 L13.30,6.95Z" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="8" cy="8" r="2.2" fill="none" stroke="#1A1A1A" stroke-width="1.5"/>
+</g>
+<text x="52" y="151" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A">Настройки</text>
+</g>
+<g id="Аккаунт">
+<line x1="16" y1="864" x2="204" y2="864" stroke="#E5E5E5" stroke-width="1"/>
+<circle cx="32" cy="900" r="16" fill="#EEEEFC"/>
+<text x="32" y="905" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#5B5BD6" text-anchor="middle">L</text>
+<text x="56" y="896" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A">listener</text>
+<circle cx="60" cy="912" r="3.5" fill="#0F7B0F"/>
+<text x="68" y="916" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Last.fm · в сети</text>
+</g>
+</g>
+<g id="Содержимое">
+<text x="256" y="84" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="28" font-weight="600" fill="#1A1A1A" id="Заголовок">Настройки</text>
+<text x="256" y="124" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A" id="Раздел «Аккаунт»">Аккаунт</text>
+<g id="Аккаунт 2">
+<rect x="256" y="136" width="668" height="72" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон" />
+<circle cx="296" cy="172" r="20" fill="#EEEEFC"/>
+<text x="296" y="178" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="16" font-weight="600" fill="#5B5BD6" text-anchor="middle">L</text>
+<text x="328" y="168" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A">listener</text>
+<text x="328" y="187" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Вход выполнен 12 октября 2026</text>
+<g id="Кнопка «Выйти»">
+<rect x="808.5" y="156.5" width="95" height="31" fill="#FFFFFF" rx="4" stroke="#D1D1D1" stroke-width="1" />
+<text x="856.0" y="177.0" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A" text-anchor="middle">Выйти</text>
+</g>
+</g>
+<text x="256" y="240" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A" id="Раздел «Правила засчитывания»">Правила засчитывания</text>
+<g id="Настройка «Засчитывать трек после»">
+<rect x="256" y="252" width="668" height="64" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 2" />
+<text x="276" y="280" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Засчитывать трек после</text>
+<text x="276" y="299" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Правило Last.fm: половина трека или 4 минуты</text>
+</g>
+<g id="Список «Порог»">
+<rect x="708.5" y="268.5" width="195" height="31" fill="#FFFFFF" rx="4" stroke="#D1D1D1" stroke-width="1" />
+<text x="720" y="289" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">половины трека</text>
+<g transform="translate(876,276) scale(1.0)">
+<path d="M4.5 6.5L8 10L11.5 6.5" fill="none" stroke="#5C5C5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+</g>
+<g id="Настройка «Не учитывать треки короче»">
+<rect x="256" y="320" width="668" height="64" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 3" />
+<text x="276" y="348" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Не учитывать треки короче</text>
+<text x="276" y="367" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Last.fm не принимает треки короче 30 секунд</text>
+</g>
+<text x="904" y="357" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#5C5C5C" text-anchor="end" id="Значение">30 секунд</text>
+<g id="Настройка «Интернет-радио»">
+<rect x="256" y="388" width="668" height="64" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 4" />
+<text x="276" y="416" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Интернет-радио</text>
+<text x="276" y="435" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Засчитывать потоки без длительности через 4 минуты</text>
+</g>
+<g id="Переключатель">
+<rect x="864" y="410" width="40" height="20" fill="#5B5BD6" rx="10" />
+<circle cx="894" cy="420" r="6" fill="#FFFFFF"/>
+</g>
+<text x="256" y="484" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A" id="Раздел «Плееры»">Плееры</text>
+<text x="321.15999999999997" y="484" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#5C5C5C">— какие учитывать</text>
+<g id="Плеер «Spotify»">
+<rect x="256" y="496" width="668" height="52" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 5" />
+<rect x="276" y="510" width="24" height="24" fill="#1DB954" rx="6" />
+<text x="288" y="527" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">S</text>
+<text x="312" y="527" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Spotify</text>
+<text x="368.06" y="527" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="600" fill="#5B5BD6">играет сейчас</text>
+<g id="Переключатель 2">
+<rect x="864" y="512" width="40" height="20" fill="#5B5BD6" rx="10" />
+<circle cx="894" cy="522" r="6" fill="#FFFFFF"/>
+</g>
+</g>
+<g id="Плеер «Google Chrome»">
+<rect x="256" y="552" width="668" height="52" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 6" />
+<rect x="276" y="566" width="24" height="24" fill="#4285F4" rx="6" />
+<text x="288" y="583" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">C</text>
+<text x="312" y="583" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Google Chrome</text>
+<g id="Переключатель 3">
+<rect x="864" y="568" width="40" height="20" fill="#5B5BD6" rx="10" />
+<circle cx="894" cy="578" r="6" fill="#FFFFFF"/>
+</g>
+</g>
+<g id="Плеер «Microsoft Edge»">
+<rect x="256" y="608" width="668" height="52" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 7" />
+<rect x="276" y="622" width="24" height="24" fill="#0C59A4" rx="6" />
+<text x="288" y="639" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">E</text>
+<text x="312" y="639" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Microsoft Edge</text>
+<g id="Переключатель 4">
+<rect x="864.5" y="624.5" width="39" height="19" fill="#FFFFFF" rx="9.5" stroke="#5C5C5C" stroke-width="1" />
+<circle cx="874" cy="634" r="5" fill="#5C5C5C"/>
+</g>
+</g>
+<g id="Плеер «Медиаплеер Windows»">
+<rect x="256" y="664" width="668" height="52" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 8" />
+<rect x="276" y="678" width="24" height="24" fill="#C239B3" rx="6" />
+<text x="288" y="695" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">М</text>
+<text x="312" y="695" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Медиаплеер Windows</text>
+<g id="Переключатель 5">
+<rect x="864" y="680" width="40" height="20" fill="#5B5BD6" rx="10" />
+<circle cx="894" cy="690" r="6" fill="#FFFFFF"/>
+</g>
+</g>
+<text x="256" y="744" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="600" fill="#1A1A1A" id="Раздел «Система»">Система</text>
+<g id="Настройка «Запускать при входе в Windows»">
+<rect x="256" y="756" width="668" height="64" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 9" />
+<text x="276" y="784" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Запускать при входе в Windows</text>
+<text x="276" y="803" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">Скробблер работает в фоне, значок — в трее</text>
+</g>
+<g id="Переключатель 6">
+<rect x="864" y="778" width="40" height="20" fill="#5B5BD6" rx="10" />
+<circle cx="894" cy="788" r="6" fill="#FFFFFF"/>
+</g>
+<g id="Настройка «Журнал работы»">
+<rect x="256" y="824" width="668" height="64" fill="#FFFFFF" rx="8" stroke="#E5E5E5" stroke-width="1" id="Фон 10" />
+<text x="276" y="852" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Журнал работы</text>
+<text x="276" y="871" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="12" font-weight="400" fill="#5C5C5C">%LOCALAPPDATA%\lastfm-scrobbler\lastfm-scrobbler.log</text>
+</g>
+<g id="Кнопка «Открыть папку»">
+<rect x="748.5" y="840.5" width="155" height="31" fill="#FFFFFF" rx="4" stroke="#D1D1D1" stroke-width="1" />
+<g transform="translate(761.5,848.0) scale(1.0)">
+<path d="M2 4.5A1 1 0 0 1 3 3.5H6.2L7.7 5H13A1 1 0 0 1 14 6V12A1 1 0 0 1 13 13H3A1 1 0 0 1 2 12Z" fill="none" stroke="#1A1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<text x="785.5" y="861.0" font-family="Segoe UI, Liberation Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#1A1A1A">Открыть папку</text>
+</g>
+</g>
+</svg>

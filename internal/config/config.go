@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +18,12 @@ const (
 	historyFile = "history.json"
 	windowFile  = "window.json"
 	radioFile   = "radio.json"
+	coverDir    = "covers"
+	lyricsDir   = "lyrics"
+	libraryFile = "library.jsonl"
+	localFile   = "local.jsonl"
+	momentsFile = "moments.json"
+	libMetaFile = "library.json"
 )
 
 type Duration time.Duration
@@ -65,6 +70,16 @@ type Config struct {
 	QueueLimit    int      `json:"queue_limit"`
 
 	LogLevel string `json:"log_level"`
+
+	PhoneAccess bool   `json:"phone_access"`
+	PhoneToken  string `json:"phone_token,omitempty"`
+	PhonePort   int    `json:"phone_port,omitempty"`
+
+	Theme        string `json:"theme,omitempty"`
+	GlitchBursts bool   `json:"glitch_bursts"`
+
+	ClosedPanels []string `json:"closed_panels,omitempty"`
+	LyricsFolder string   `json:"lyrics_folder,omitempty"`
 }
 
 func Default() Config {
@@ -74,18 +89,12 @@ func Default() Config {
 		MinTrackLength:    Duration(30 * time.Second),
 		MaxPlayTime:       Duration(4 * time.Minute),
 		SkipUnknownLength: false,
-		IgnoredPlayers:    defaultIgnored(),
+		IgnoredPlayers:    []string{},
 		RetryInterval:     Duration(time.Minute),
 		QueueLimit:        5000,
 		LogLevel:          "info",
+		GlitchBursts:      true,
 	}
-}
-
-func defaultIgnored() []string {
-	if runtime.GOOS == "windows" {
-		return []string{}
-	}
-	return []string{"firefox", "chromium", "google-chrome", "kdeconnect"}
 }
 
 func (c *Config) applyEnv() {
@@ -123,46 +132,30 @@ func (c *Config) Validate() error {
 	if c.LogLevel == "" {
 		c.LogLevel = d.LogLevel
 	}
+	if c.PhonePort < 0 || c.PhonePort > 65535 {
+		c.PhonePort = 0
+	}
 	return nil
 }
 
 func Dir() (string, error) {
-	if runtime.GOOS == "windows" {
-		base, err := os.UserConfigDir()
-		if err != nil {
+	base := os.Getenv("APPDATA")
+	if base == "" {
+		var err error
+		if base, err = os.UserConfigDir(); err != nil {
 			return "", fmt.Errorf("не удалось определить каталог %%APPDATA%%: %w", err)
 		}
-		return filepath.Join(base, AppName), nil
-	}
-	base := os.Getenv("XDG_CONFIG_HOME")
-	if base == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", fmt.Errorf("не удалось определить домашний каталог: %w", err)
-		}
-		base = filepath.Join(home, ".config")
 	}
 	return filepath.Join(base, AppName), nil
 }
 
 func StateDir() (string, error) {
-	if runtime.GOOS == "windows" {
-		base := os.Getenv("LOCALAPPDATA")
-		if base == "" {
-			var err error
-			if base, err = os.UserCacheDir(); err != nil {
-				return "", fmt.Errorf("не удалось определить каталог %%LOCALAPPDATA%%: %w", err)
-			}
-		}
-		return filepath.Join(base, AppName), nil
-	}
-	base := os.Getenv("XDG_STATE_HOME")
+	base := os.Getenv("LOCALAPPDATA")
 	if base == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", fmt.Errorf("не удалось определить домашний каталог: %w", err)
+		var err error
+		if base, err = os.UserCacheDir(); err != nil {
+			return "", fmt.Errorf("не удалось определить каталог %%LOCALAPPDATA%%: %w", err)
 		}
-		base = filepath.Join(home, ".local", "state")
 	}
 	return filepath.Join(base, AppName), nil
 }
@@ -205,6 +198,61 @@ func WindowPath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(dir, windowFile), nil
+}
+
+func LocalPath() (string, error) {
+	dir, err := StateDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, localFile), nil
+}
+
+func LibraryPaths() (plays, meta string, err error) {
+	dir, err := StateDir()
+	if err != nil {
+		return "", "", err
+	}
+	return filepath.Join(dir, libraryFile), filepath.Join(dir, libMetaFile), nil
+}
+
+func CoverDir() (string, error) {
+	dir, err := StateDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, coverDir), nil
+}
+
+func MomentsPath() (string, error) {
+	dir, err := StateDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, momentsFile), nil
+}
+
+func DefaultLyricsFolder() string {
+	home, err := os.UserHomeDir()
+	if err != nil || home == "" {
+		return ""
+	}
+	return filepath.Join(home, "Music", "Lyrics")
+}
+
+func (c Config) LyricsPath() string {
+	if dir := strings.TrimSpace(c.LyricsFolder); dir != "" {
+		return filepath.Clean(dir)
+	}
+	return DefaultLyricsFolder()
+}
+
+func LyricsDir() (string, error) {
+	dir, err := StateDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, lyricsDir), nil
 }
 
 func RadioPath() (string, error) {

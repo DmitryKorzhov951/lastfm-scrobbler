@@ -1,5 +1,7 @@
 package version
 
+const Name = "Следилка за музыкой"
+
 var Version = "dev"
 
 func UserAgent() string {

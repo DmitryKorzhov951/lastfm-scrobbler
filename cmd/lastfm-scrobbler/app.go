@@ -2,46 +2,47 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/atomicfile"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/config"
 	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/ui"
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/version"
 )
 
 const exitNoWebView = 3
 
 var (
-	errNoWebView   = errors.New("не найден WebView2 Runtime — встроенный движок Edge для окон программ")
-	errPageTimeout = errors.New("страница не появилась во встроенном окне")
-	errNoLoader    = errors.New("рядом с программой нет WebView2Loader.dll — он должен лежать в той же папке, что и exe")
+	errNoWebView   = errors.New("в Windows не найден WebView2 Runtime — движок, которым программы рисуют свои окна")
+	errPageTimeout = errors.New("окно не загрузилось за 30 секунд")
 )
 
-func cmdApp(ctx context.Context, e *env, args []string, trayOnly bool) error {
-	fs := flag.NewFlagSet("app", flag.ContinueOnError)
-	noTray := fs.Bool("no-tray", false, "без значка в трее (для отладки)")
-	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "lastfm-scrobbler [-tray] app [-no-tray]")
-		fs.PrintDefaults()
-	}
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
-
+func cmdApp(ctx context.Context, e *env, trayOnly bool) error {
 	release, err := acquireInstance()
 	if err != nil {
-		if u := runningWindowURL(); u != "" {
+		u := runningWindowURL()
+		if u != "" && sameBuild(u) {
 			return showRunningWindow(u)
 		}
-		return err
+		e.log.Info("работает другая копия программы — останавливаю её и запускаюсь вместо неё")
+		if r := replaceRunning(); r != nil {
+			release = r
+		} else if u != "" {
+			return showRunningWindow(u)
+		} else {
+			return err
+		}
 	}
 	defer release()
+	refreshAutostart(e)
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -54,7 +55,7 @@ func cmdApp(ctx context.Context, e *env, args []string, trayOnly bool) error {
 		}
 	}()
 
-	svc, err := newService(e, false)
+	svc, err := newService(e)
 	if err != nil {
 		return err
 	}
@@ -62,12 +63,15 @@ func cmdApp(ctx context.Context, e *env, args []string, trayOnly bool) error {
 	if err != nil {
 		return fmt.Errorf("запуск окна: %w", err)
 	}
+	srv.SetAbout(currentAbout())
 	go func() {
 		if err := srv.Serve(); err != nil {
 			e.log.Error("сервер окна остановился", "err", err)
 		}
 	}()
 	defer srv.Close()
+	svc.startPhone(&uiBackend{svc: svc, env: e})
+	defer svc.stopPhone()
 
 	show := watchShow(ctx)
 
@@ -101,17 +105,12 @@ func cmdApp(ctx context.Context, e *env, args []string, trayOnly bool) error {
 		cancel()
 	}()
 
-	if !trayOnly || !svc.sub.Status().LoggedIn {
+	if !trayOnly {
 		open()
 	}
 
-	if *noTray {
-		fmt.Println(srv.URL())
-		<-ctx.Done()
-	} else {
-		runTray(ctx, svc, e, open)
-		cancel()
-	}
+	runTray(ctx, svc, e, open)
+	cancel()
 	return <-runErr
 }
 
@@ -141,9 +140,34 @@ func runningWindowURL() string {
 	return u
 }
 
-func cmdOpen(ctx context.Context, e *env, args []string) error {
-	if u := runningWindowURL(); u != "" {
-		return showRunningWindow(u)
+type appAbout struct {
+	Version string `json:"version"`
+	Dir     string `json:"dir"`
+}
+
+func currentAbout() appAbout {
+	a := appAbout{Version: version.Version}
+	if exe, err := os.Executable(); err == nil {
+		a.Dir = filepath.Dir(exe)
 	}
-	return cmdApp(ctx, e, args, false)
+	return a
+}
+
+func sameBuild(windowURL string) bool {
+	base, _, _ := strings.Cut(windowURL, "#")
+	client := http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get(strings.TrimSuffix(base, "/") + "/about")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	var a appAbout
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 4096)).Decode(&a); err != nil {
+		return false
+	}
+	cur := currentAbout()
+	return a.Version == cur.Version && strings.EqualFold(filepath.Clean(a.Dir), filepath.Clean(cur.Dir))
 }

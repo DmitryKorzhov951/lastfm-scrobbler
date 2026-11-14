@@ -28,6 +28,7 @@ type Raw struct {
 	End         int64
 	Position    int64
 	Updated     int64
+	Art         []byte
 }
 
 const freshWindow = 6 * time.Second
@@ -165,13 +166,12 @@ func ToState(r Raw, at time.Time) media.State {
 	}
 
 	fresh := false
-	if updated := FromDateTime(r.Updated); !updated.IsZero() && status == media.Playing {
+	updated := FromDateTime(r.Updated)
+	if !updated.IsZero() && status == media.Playing {
 		age := at.Sub(updated)
-		if age >= -time.Second && age <= freshWindow {
-			fresh = true
-			if age > 0 {
-				pos += age
-			}
+		fresh = age >= -time.Second && age <= freshWindow
+		if age > 0 {
+			pos += age
 		}
 	}
 	if t.Length > 0 && pos > t.Length {
@@ -179,14 +179,17 @@ func ToState(r Raw, at time.Time) media.State {
 	}
 
 	return media.State{
-		ID:            id,
-		Name:          name,
-		Identity:      Identity(name),
-		Status:        status,
-		Track:         t,
-		Position:      pos,
-		At:            at,
-		PositionFresh: fresh,
+		ID:               id,
+		Name:             name,
+		Identity:         Identity(name),
+		Status:           status,
+		Track:            t,
+		Position:         pos,
+		At:               at,
+		PositionFresh:    fresh,
+		PositionKnown:    !updated.IsZero(),
+		PositionReported: updated,
+		Art:              r.Art,
 	}
 }
 

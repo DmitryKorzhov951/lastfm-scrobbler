@@ -4,6 +4,7 @@
 package edge
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,6 +32,8 @@ type Chromium struct {
 	environment *ICoreWebView2Environment
 
 	DataPath string
+
+	Err error
 
 	permissions      map[CoreWebView2PermissionKind]CoreWebView2PermissionState
 	globalPermission *CoreWebView2PermissionState
@@ -71,9 +74,11 @@ func (e *Chromium) Embed(hwnd uintptr) bool {
 
 	res, err := createCoreWebView2EnvironmentWithOptions(nil, windows.StringToUTF16Ptr(dataPath), 0, e.envCompleted)
 	if err != nil {
+		e.Err = err
 		log.Printf("Error calling Webview2Loader: %v", err)
 		return false
 	} else if res != 0 {
+		e.Err = fmt.Errorf("код ошибки 0x%08X", uint32(res))
 		log.Printf("Result: %08x", res)
 		return false
 	}

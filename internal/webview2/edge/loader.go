@@ -9,6 +9,7 @@ import (
 	"sync"
 	"unsafe"
 
+	"github.com/DmitryKorzhov951/cpp_learn/lastfm-scrobbler/internal/webview2/webviewloader"
 	"golang.org/x/sys/windows"
 )
 
@@ -35,10 +36,15 @@ func loader() (*windows.DLL, error) {
 	return loaderDLL, loaderErr
 }
 
+func BuiltinLoader() bool {
+	_, err := loader()
+	return err != nil
+}
+
 func InstalledVersion() (string, error) {
 	dll, err := loader()
 	if err != nil {
-		return "", err
+		return webviewloader.GetAvailableCoreWebView2BrowserVersionString("")
 	}
 	proc, err := dll.FindProc("GetAvailableCoreWebView2BrowserVersionString")
 	if err != nil {
@@ -56,10 +62,22 @@ func InstalledVersion() (string, error) {
 	return windows.UTF16PtrToString(result), nil
 }
 
+type builtinEnvHandler struct {
+	h *iCoreWebView2CreateCoreWebView2EnvironmentCompletedHandler
+}
+
+func (b builtinEnvHandler) EnvironmentCompleted(code webviewloader.HRESULT, env *webviewloader.ICoreWebView2Environment) webviewloader.HRESULT {
+	res := b.h.impl.EnvironmentCompleted(uintptr(code), (*ICoreWebView2Environment)(unsafe.Pointer(env)))
+	return webviewloader.HRESULT(int32(res))
+}
+
 func createCoreWebView2EnvironmentWithOptions(browserExecutableFolder, userDataFolder *uint16, environmentOptions uintptr, handler *iCoreWebView2CreateCoreWebView2EnvironmentCompletedHandler) (uintptr, error) {
 	dll, err := loader()
 	if err != nil {
-		return 0, err
+		args := os.Getenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS")
+		return 0, webviewloader.CreateCoreWebView2EnvironmentWithOptions(builtinEnvHandler{handler},
+			webviewloader.WithUserDataFolder(windows.UTF16PtrToString(userDataFolder)),
+			webviewloader.WithAdditionalBrowserArguments(args))
 	}
 	proc, err := dll.FindProc("CreateCoreWebView2EnvironmentWithOptions")
 	if err != nil {

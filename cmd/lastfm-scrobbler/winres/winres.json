@@ -18,13 +18,13 @@
         },
         "info": {
           "0419": {
-            "Comments": "Скробблер Last.fm и интернет-радио. Исходный код: https://github.com/DmitryKorzhov951/cpp_learn",
+            "Comments": "Следилка за музыкой: скробблер Last.fm и интернет-радио. Исходный код: https://github.com/DmitryKorzhov951/cpp_learn",
             "CompanyName": "DmitryKorzhov951",
-            "FileDescription": "Скробблер Last.fm",
+            "FileDescription": "Следилка за музыкой",
             "FileVersion": "1.0.0",
             "InternalName": "lastfm-scrobbler",
             "LegalCopyright": "© 2026 DmitryKorzhov951",
-            "ProductName": "Скробблер Last.fm",
+            "ProductName": "Следилка за музыкой",
             "ProductVersion": "1.0.0"
           }
         }
